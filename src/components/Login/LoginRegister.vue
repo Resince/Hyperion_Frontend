@@ -1,26 +1,26 @@
 <script setup lang="ts">
 import {reactive, ref} from 'vue';
-import request from '@/utils/request';
+import request from '@/utils/request.js';
 import {ElMessage} from "element-plus";
 import store from "@/store";
 
 const activeTab = ref('login');
 const registerData = ref({
-  username: '',
-  phone:'',
-  password: '',
+  name: '',
+  tel:'',
+  pass: '',
   email: '',
   confirmPassword: '',
-  usertype: '',
+  role: "",
 });
 const loginData = ref({
-  phone: '',
+  tel: '',
   password: '',
 });
 const handleTabClick = (tab) => {
-  registerData.value.username = '';
-  registerData.value.phone='';
-  registerData.value.password = '';
+  registerData.value.name = '';
+  registerData.value.tel='';
+  registerData.value.pass = '';
   registerData.value.email = '';
   registerData.value.confirmPassword = '';
   registerData.value.usertype = '';
@@ -28,7 +28,7 @@ const handleTabClick = (tab) => {
 function validateConfirmPassword(rule, value, callback) {
   if (value === '') {
     callback(new Error('请再次输入密码'));
-  } else if (value !== registerData.value.password) {
+  } else if (value !== registerData.value.pass) {
     callback(new Error('两次输入密码不一致'));
   } else {
     callback();
@@ -40,7 +40,7 @@ const registerRules=reactive(
         { required: true, message: '请输入用户名', trigger: 'blur' },
         { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
       ],
-      phone:[
+      tel:[
         { required: true, message: '请输入手机号', trigger: 'blur' },
         { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
       ],
@@ -69,7 +69,7 @@ const loginFormRef=ref(null)
 
 const loginRules=reactive(
     {
-      phone:[
+      tel:[
         // { required: true, message: '请输入手机号', trigger: 'blur' },
         { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
       ],
@@ -84,12 +84,13 @@ const ToLogin = async (form: any | undefined) => {
   await form.validate((valid: boolean, fields: any) => {
     if (valid) {
       console.log('loginData', loginData.value);
-      if (loginData.value.phone === '' || loginData.value.password === '') {
+      if (loginData.value.tel === '' || loginData.value.password === '') {
         ElMessage.error('请输入手机号和密码');
         return;
       }
-      request.post('/login', loginData.value).then((res) => {
+      request.post('/user/login', loginData.value).then((res) => {
         console.log(res);
+        localStorage.setItem('token', token);
         store.dispatch('saveToken', res.data.token); // 假设后端返回的 token 在 res.data.token
       }).catch((error) => {
         console.log(error);
@@ -103,7 +104,7 @@ const ToLogin = async (form: any | undefined) => {
 
 const ToRegister = () => {
   console.log('registerData', registerData.value);
-  request.post('/register', registerData.value).then((res) => {
+  request.post('/user/register', registerData.value).then((res) => {
     console.log(res);
   }).catch((error) => {
     console.log(error);
@@ -124,8 +125,8 @@ const ToRegister = () => {
     <el-tabs v-model="activeTab" @tab-click="handleTabClick" class="w-5/6 space-y-6">
       <el-tab-pane label="登录" name="login" class="m-3">
         <el-form :model="loginData"  label-width="70px" :rules="loginRules" ref="loginFormRef">
-          <el-form-item label="手机号" prop="phone">
-            <el-input v-model="loginData.phone" placeholder="请输入手机号"></el-input>
+          <el-form-item label="手机号" prop="tel">
+            <el-input v-model="loginData.tel" placeholder="请输入手机号"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="password">
             <el-input v-model="loginData.password" type="password" placeholder="请输入密码"></el-input>
@@ -138,24 +139,24 @@ const ToRegister = () => {
       <el-tab-pane label="注册" name="register" class="m-3">
         <el-form :model="registerData" :rules="registerRules"   label-width="80px">
           <el-form-item label="用户名" prop="username">
-            <el-input v-model="registerData.username" placeholder="请输入用户名"></el-input>
+            <el-input v-model="registerData.name" placeholder="请输入用户名"></el-input>
           </el-form-item>
-          <el-form-item label="手机号" prop="phone">
-            <el-input v-model="registerData.phone" placeholder="请输入手机号"></el-input>
+          <el-form-item label="手机号" prop="tel">
+            <el-input v-model="registerData.tel" placeholder="请输入手机号"></el-input>
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="registerData.email" placeholder="请输入邮箱"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="password">
-            <el-input v-model="registerData.password" type="password" placeholder="请输入密码"></el-input>
+            <el-input v-model="registerData.pass" type="password" placeholder="请输入密码"></el-input>
           </el-form-item>
           <el-form-item label="确认密码" prop="confirmPassword">
             <el-input v-model="registerData.confirmPassword" type="password" placeholder="请确认密码"></el-input>
           </el-form-item>
           <el-form-item label="用户类型" prop="usertype">
-            <el-radio-group v-model="registerData.usertype">
-              <el-radio value="user" size="large" >用户</el-radio>
-              <el-radio value="merchant" size="large">商家</el-radio>
+            <el-radio-group v-model="registerData.role">
+              <el-radio value="CONSUMER" size="large" >用户</el-radio>
+              <el-radio value="MERCHANT" size="large">商家</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item>
