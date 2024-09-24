@@ -15,7 +15,7 @@ const registerData = ref({
 });
 const loginData = ref({
   tel: '',
-  password: '',
+  pass: '',
 });
 const handleTabClick = (tab) => {
   registerData.value.name = '';
@@ -23,7 +23,7 @@ const handleTabClick = (tab) => {
   registerData.value.pass = '';
   registerData.value.email = '';
   registerData.value.confirmPassword = '';
-  registerData.value.usertype = '';
+  registerData.value.role = '';
 };
 function validateConfirmPassword(rule, value, callback) {
   if (value === '') {
@@ -36,7 +36,7 @@ function validateConfirmPassword(rule, value, callback) {
 }
 const registerRules=reactive(
     {
-      username: [
+      name: [
         { required: true, message: '请输入用户名', trigger: 'blur' },
         { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
       ],
@@ -44,9 +44,9 @@ const registerRules=reactive(
         { required: true, message: '请输入手机号', trigger: 'blur' },
         { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
       ],
-      password: [
+      pass: [
         { required: true, message: '请输入密码', trigger: 'blur' },
-        { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
+        { pattern: /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$/ , message: '密码必须包含数字和字母，且长度在6-16位之间', trigger: 'blur' }
       ],
       email: [
         { required: true, message: '请输入邮箱', trigger: 'blur' },
@@ -56,7 +56,7 @@ const registerRules=reactive(
         { required: true, message: '请再次输入密码', trigger: 'blur' },
         { validator: validateConfirmPassword, trigger: 'blur' }
       ],
-      usertype: [
+      role: [
         { required: true, message: '请选择用户类型', trigger: 'change' }
       ]
     }
@@ -128,8 +128,8 @@ const ToRegister = () => {
           <el-form-item label="手机号" prop="tel">
             <el-input v-model="loginData.tel" placeholder="请输入手机号"></el-input>
           </el-form-item>
-          <el-form-item label="密码" prop="password">
-            <el-input v-model="loginData.password" type="password" placeholder="请输入密码"></el-input>
+          <el-form-item label="密码" prop="pass">
+            <el-input v-model="loginData.pass" type="password" placeholder="请输入密码"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="ToLogin(loginFormRef)">登录</el-button>
@@ -138,7 +138,7 @@ const ToRegister = () => {
       </el-tab-pane>
       <el-tab-pane label="注册" name="register" class="m-3">
         <el-form :model="registerData" :rules="registerRules"   label-width="80px">
-          <el-form-item label="用户名" prop="username">
+          <el-form-item label="用户名" prop="name">
             <el-input v-model="registerData.name" placeholder="请输入用户名"></el-input>
           </el-form-item>
           <el-form-item label="手机号" prop="tel">
@@ -147,13 +147,13 @@ const ToRegister = () => {
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="registerData.email" placeholder="请输入邮箱"></el-input>
           </el-form-item>
-          <el-form-item label="密码" prop="password">
+          <el-form-item label="密码" prop="pass">
             <el-input v-model="registerData.pass" type="password" placeholder="请输入密码"></el-input>
           </el-form-item>
           <el-form-item label="确认密码" prop="confirmPassword">
             <el-input v-model="registerData.confirmPassword" type="password" placeholder="请确认密码"></el-input>
           </el-form-item>
-          <el-form-item label="用户类型" prop="usertype">
+          <el-form-item label="用户类型" prop="role">
             <el-radio-group v-model="registerData.role">
               <el-radio value="CONSUMER" size="large" >用户</el-radio>
               <el-radio value="MERCHANT" size="large">商家</el-radio>
