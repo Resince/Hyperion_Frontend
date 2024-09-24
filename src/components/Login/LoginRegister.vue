@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import {reactive, ref} from 'vue';
-import request from '@/utils/request.js';
+import request from '@/utils/request';
 import {ElMessage} from "element-plus";
 import store from "@/store";
-
+// import { Md5 } from 'ts-md5';
 const activeTab = ref('login');
+import Md5 from 'crypto-js/md5';
+import router from "@/router/router";
 const registerData = ref({
   name: '',
   tel:'',
@@ -63,9 +65,7 @@ const registerRules=reactive(
 )
 
 const loginFormRef=ref(null)
-
-
-
+const registerFormRef=ref(null)
 
 const loginRules=reactive(
     {
@@ -73,25 +73,25 @@ const loginRules=reactive(
         // { required: true, message: '请输入手机号', trigger: 'blur' },
         { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
       ],
-      // password: [
-      //   { required: true, message: '请输入手机号', trigger: 'blur' },
-      //   { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
-      // ]
     }
 )
 const ToLogin = async (form: any | undefined) => {
   if (!form) return;
   await form.validate((valid: boolean, fields: any) => {
     if (valid) {
-      console.log('loginData', loginData.value);
+      // console.log('loginData', loginData.value);
       if (loginData.value.tel === '' || loginData.value.password === '') {
         ElMessage.error('请输入手机号和密码');
         return;
       }
-      request.post('/user/login', loginData.value).then((res) => {
+      const temp={...loginData.value};
+      temp.pass=Md5(loginData.value.pass).toString();
+      console.log('temp', temp);
+      request.post('/user/login', temp).then((res) => {
         console.log(res);
         localStorage.setItem('token', token);
         store.dispatch('saveToken', res.data.token); // 假设后端返回的 token 在 res.data.token
+        router.push('/consumer');
       }).catch((error) => {
         console.log(error);
         ElMessage.error('登录失败');
@@ -102,15 +102,29 @@ const ToLogin = async (form: any | undefined) => {
   });
 };
 
-const ToRegister = () => {
-  console.log('registerData', registerData.value);
-  request.post('/user/register', registerData.value).then((res) => {
-    console.log(res);
-  }).catch((error) => {
-    console.log(error);
-    ElMessage.error('注册失败');
+const ToRegister = async (form: any | undefined) => {
+  if (!form) return;
+  await form.validate((valid: boolean, fields: any) => {
+    if (valid) {
+      const temp={...registerData.value};
+      console.log('registerData', registerData.value);
+      temp.pass = Md5(registerData.value.pass).toString();
+      // console.log("form: " ,form);
+      // console.log('test md5', registerData.value.pass);
+      console.log('temp', temp);
+      request.post('/user/register', temp).then((res) => {
+        console.log(res);
+      }).catch((error) => {
+        console.log(error);
+        ElMessage.error('注册失败');
+      });
+    } else {
+      ElMessage.error('Wrong input');
+    }
   });
 };
+
+
 
 </script>
 
@@ -137,7 +151,7 @@ const ToRegister = () => {
         </el-form>
       </el-tab-pane>
       <el-tab-pane label="注册" name="register" class="m-3">
-        <el-form :model="registerData" :rules="registerRules"   label-width="80px">
+        <el-form :model="registerData" :rules="registerRules"   label-width="80px" ref="registerFormRef">
           <el-form-item label="用户名" prop="name">
             <el-input v-model="registerData.name" placeholder="请输入用户名"></el-input>
           </el-form-item>
@@ -160,7 +174,7 @@ const ToRegister = () => {
             </el-radio-group>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="ToRegister">注册</el-button>
+            <el-button type="primary" @click="ToRegister(registerFormRef)">注册</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
