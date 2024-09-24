@@ -1,7 +1,5 @@
 import axios from 'axios'
-import  ResponseCode  from './responseCode';
 
-import {toast} from '@/components/ui/toast/use-toast'
 
 
 const request =axios.create({

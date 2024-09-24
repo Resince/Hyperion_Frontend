@@ -154,10 +154,10 @@ const ToRegister = () => {
 
 .loginregister-container {
   width: 100%;
-  flex: 1;
+  flex : 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10px;
+  padding: 5px;
 }
 </style>
