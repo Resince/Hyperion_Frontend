@@ -2,21 +2,24 @@
 import {reactive, ref} from 'vue';
 import request from '@/utils/request';
 import {ElMessage} from "element-plus";
+import store from "@/store";
 
 const activeTab = ref('login');
 const registerData = ref({
   username: '',
+  phone:'',
   password: '',
   email: '',
   confirmPassword: '',
   usertype: '',
 });
 const loginData = ref({
-  username: '',
+  phone: '',
   password: '',
 });
 const handleTabClick = (tab) => {
   registerData.value.username = '';
+  registerData.value.phone='';
   registerData.value.password = '';
   registerData.value.email = '';
   registerData.value.confirmPassword = '';
@@ -37,6 +40,10 @@ const registerRules=reactive(
         { required: true, message: '请输入用户名', trigger: 'blur' },
         { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
       ],
+      phone:[
+        { required: true, message: '请输入手机号', trigger: 'blur' },
+        { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+      ],
       password: [
         { required: true, message: '请输入密码', trigger: 'blur' },
         { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
@@ -55,13 +62,42 @@ const registerRules=reactive(
     }
 )
 
-const ToLogin = () => {
-  console.log('loginData', loginData.value);
-  request.post('/login', loginData.value).then((res) => {
-    console.log(res);
-  }).catch((error) => {
-    console.log(error);
-    ElMessage.error('登录失败');
+const loginFormRef=ref(null)
+
+
+
+
+const loginRules=reactive(
+    {
+      phone:[
+        // { required: true, message: '请输入手机号', trigger: 'blur' },
+        { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+      ],
+      // password: [
+      //   { required: true, message: '请输入手机号', trigger: 'blur' },
+      //   { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+      // ]
+    }
+)
+const ToLogin = async (form: any | undefined) => {
+  if (!form) return;
+  await form.validate((valid: boolean, fields: any) => {
+    if (valid) {
+      console.log('loginData', loginData.value);
+      if (loginData.value.phone === '' || loginData.value.password === '') {
+        ElMessage.error('请输入手机号和密码');
+        return;
+      }
+      request.post('/login', loginData.value).then((res) => {
+        console.log(res);
+        store.dispatch('saveToken', res.data.token); // 假设后端返回的 token 在 res.data.token
+      }).catch((error) => {
+        console.log(error);
+        ElMessage.error('登录失败');
+      });
+    } else {
+      ElMessage.error('Wrong input');
+    }
   });
 };
 
@@ -86,23 +122,26 @@ const ToRegister = () => {
 
   <div class="loginregister-container">
     <el-tabs v-model="activeTab" @tab-click="handleTabClick" class="w-5/6 space-y-6">
-      <el-tab-pane label="登录" name="login">
-        <el-form :model="loginData"  label-width="60px">
-          <el-form-item label="用户名">
-            <el-input v-model="loginData.username" placeholder="请输入用户名"></el-input>
+      <el-tab-pane label="登录" name="login" class="m-3">
+        <el-form :model="loginData"  label-width="70px" :rules="loginRules" ref="loginFormRef">
+          <el-form-item label="手机号" prop="phone">
+            <el-input v-model="loginData.phone" placeholder="请输入手机号"></el-input>
           </el-form-item>
-          <el-form-item label="密码">
+          <el-form-item label="密码" prop="password">
             <el-input v-model="loginData.password" type="password" placeholder="请输入密码"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="ToLogin">登录</el-button>
+            <el-button type="primary" @click="ToLogin(loginFormRef)">登录</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
-      <el-tab-pane label="注册" name="register">
-        <el-form :model="registerData" :rules="registerRules"   label-width="70px">
+      <el-tab-pane label="注册" name="register" class="m-3">
+        <el-form :model="registerData" :rules="registerRules"   label-width="80px">
           <el-form-item label="用户名" prop="username">
             <el-input v-model="registerData.username" placeholder="请输入用户名"></el-input>
+          </el-form-item>
+          <el-form-item label="手机号" prop="phone">
+            <el-input v-model="registerData.phone" placeholder="请输入手机号"></el-input>
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="registerData.email" placeholder="请输入邮箱"></el-input>
