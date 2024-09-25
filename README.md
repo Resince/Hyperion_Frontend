@@ -4,7 +4,8 @@
 
 ### 相关技术栈
 
-+ vue 组合式组件
++ vue3 使用组合式api
 + TypeScript
 + vite 作为构建工具
-+ 
++ element-ui plus 作为主要ui
++ tailwind css
