@@ -7,7 +7,6 @@ const name=store.state.name;
 <template>
     <sidebar :name="name"/>
     <router-view/>
-
 </template>
 
 <style scoped>

@@ -1,7 +1,7 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory} from 'vue-router'
 import LoginRegister from "@/components/Login/LoginRegister.vue"
 
-const routes=[
+const routes = [
     {
         path: '/',
         redirect: '/login',
@@ -13,9 +13,33 @@ const routes=[
         component: LoginRegister
     },
     {
-        path:'/consumer',
-        name:'Consumer',
-        component:()=>import('@/components/consumer/consumer.vue')
+        path: '/consumer',
+        name: 'Consumer',
+        component: () => import('@/components/consumer/consumer.vue'),
+        redirect: '/consumer/profile',
+        children: [
+            {
+                path: 'profile',
+                name: 'Profile',
+                component: () => import('@/components/consumer/profile.vue')
+            },
+            {
+                path: 'orders',
+                name: 'Orders',
+                component: () => import('@/components/consumer/orders.vue')
+            },
+            {
+                path: 'trolly',
+                name: 'Trolly',
+                component: () => import('@/components/consumer/trolly.vue')
+            },
+            {
+                path: 'shop',
+                name: 'Shop',
+                component: () => import('@/components/consumer/shop.vue')
+
+            }
+        ]
     }
 ]
 
