@@ -16,6 +16,7 @@ const routes = [
         path: '/consumer',
         name: 'Consumer',
         component: () => import('@/components/consumer/consumer.vue'),
+        // component: ()=> import ('@/layout/index.vue'),
         redirect: '/consumer/profile',
         children: [
             {

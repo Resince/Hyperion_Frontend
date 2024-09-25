@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import store from "@/store";
 import Sidebar from "@/components/consumer/sidebar.vue";
-const name=store.state.name;
+const name=store.state.userInfo?.name;
+import layout from "@/layout/index.vue";
 </script>
 
 <template>
-    <sidebar :name="name"/>
+    <layout :name="name"/>
     <router-view/>
 </template>
 
