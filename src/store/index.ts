@@ -1,25 +1,24 @@
 import { createStore } from 'vuex';
+import { UserInfo } from '@/types/user';
+import {ref} from "vue";
+
+const userInfo = ref<UserInfo | null>(null);
 
 export default createStore({
     state: {
-        token: '',
-        name: '',
+        userInfo: userInfo.value,
     },
     mutations: {
-        setToken(state, token) {
-            state.token = token;
-        },
-        setName(state, name) {
-            state.name = name;
+        setUserInfo(state, userInfo) {
+            state.userInfo = userInfo;
         }
     },
     actions: {
-        saveToken({ commit }, token) {
-            commit('setToken', token);
+        saveUserInfo({ commit }, userInfo) {
+            commit('setUserInfo', userInfo);
         }
-
     },
     getters: {
-        getToken: (state) => state.token
+        getToken: (state) => state.userInfo?.token
     }
 });
