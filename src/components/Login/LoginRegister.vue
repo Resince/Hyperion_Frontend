@@ -85,12 +85,15 @@ const ToLogin = async (form: any | undefined) => {
         return;
       }
       const temp={...loginData.value};
-      temp.pass=Md5(loginData.value.pass).toString();
+      // temp.pass=Md5(loginData.value.pass).toString();
       console.log('temp', temp);
       request.post('/user/login', temp).then((res) => {
-        console.log(res);
+        // console.log(res);
+        //TODO: FIX
+        const token = res.data;
         localStorage.setItem('token', token);
-        store.dispatch('saveToken', res.data.token); // 假设后端返回的 token 在 res.data.token]
+        store.dispatch('saveToken', token); // 假设后端返回的 token 在 res.data.token
+        console.log('token', token);
         store.commit('setName', res.data.name);
         router.push('/consumer');
       }).catch((error) => {
