@@ -57,7 +57,6 @@ const cancelEdit = () => {
 .user-info {
   width: 400px;
   margin: 50px auto auto auto;
-  //margin-top: 20px;
   height: auto;
   padding: 20px;
   border: 1px solid #ccc;
