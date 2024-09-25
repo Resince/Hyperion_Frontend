@@ -91,6 +91,7 @@ const ToLogin = async (form: any | undefined) => {
         console.log(res);
         localStorage.setItem('token', token);
         store.dispatch('saveToken', res.data.token); // 假设后端返回的 token 在 res.data.token]
+        store.commit('setName', res.data.name);
         router.push('/consumer');
       }).catch((error) => {
         console.log(error);

@@ -4,14 +4,18 @@ import LoginRegister from "@/components/Login/LoginRegister.vue"
 const routes=[
     {
         path: '/',
-        redicrect: '/login',
-        // name: 'LoginRegister',
-        component: LoginRegister
+        redirect: '/login',
+        // component: LoginRegister
     },
     {
         path: '/login',
         name: 'Login',
         component: LoginRegister
+    },
+    {
+        path:'/consumer',
+        name:'Consumer',
+        component:()=>import('@/components/consumer/consumer.vue')
     }
 ]
 
