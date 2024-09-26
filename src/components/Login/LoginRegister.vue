@@ -3,10 +3,11 @@ import {reactive, ref} from 'vue';
 import request from '@/utils/request';
 import {ElMessage} from "element-plus";
 import store from "@/store";
-// import { Md5 } from 'ts-md5';
+
 const activeTab = ref('login');
 import Md5 from 'crypto-js/md5';
 import router from "@/router/router";
+import {UserInfo} from "@/types/user";
 const registerData = ref({
   name: '',
   tel:'',
@@ -85,12 +86,19 @@ const ToLogin = async (form: any | undefined) => {
         return;
       }
       const temp={...loginData.value};
-      temp.pass=Md5(loginData.value.pass).toString();
+      // temp.pass=Md5(loginData.value.pass).toString();
       console.log('temp', temp);
       request.post('/user/login', temp).then((res) => {
-        console.log(res);
+        // console.log(res);
+        //TODO: FIX
+        const id=res.data.id;
+        const token = res.data.token;
+        const name= res.data.name;
+        const role= res.data.role;
+        const userinfo: UserInfo={id,name,role,token};
         localStorage.setItem('token', token);
-        store.dispatch('saveToken', res.data.token); // 假设后端返回的 token 在 res.data.token
+        store.dispatch('saveUserInfo', userinfo);
+        console.log('userinfo::', userinfo);
         router.push('/consumer');
       }).catch((error) => {
         console.log(error);
