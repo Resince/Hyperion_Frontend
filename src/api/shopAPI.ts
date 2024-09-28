@@ -1,9 +1,8 @@
-import {request} from "@/utils/request"
+import { request } from "@/utils/request";
 
-
-export const getGoodsListAPI = () =>{
+export const getGoodsListAPI = () => {
     return request({
         url: `/goods/list`,
-        method: 'get'
-    })
-}
+        method: "get",
+    });
+};
