@@ -13,6 +13,10 @@ const request =axios.create({
 
 request.interceptors.request.use(
     (config)=>{
+        //如果是注册就不写token
+        if(config.url==='/user/register' || config.url==='/user/login'){
+            return config;
+        }
         const token=localStorage.getItem('token');
         if(token){
             console.log('token:',token);

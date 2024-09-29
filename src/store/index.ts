@@ -16,6 +16,7 @@ export default createStore({
     actions: {
         saveUserInfo({ commit }, userInfo) {
             commit('setUserInfo', userInfo);
+            console.log('saveUserInfo:', userInfo);
         }
     },
     getters: {

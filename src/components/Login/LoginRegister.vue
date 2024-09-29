@@ -19,6 +19,7 @@ const registerData = ref({
 const loginData = ref({
   tel: '',
   pass: '',
+  role: ''
 });
 const handleTabClick = (tab) => {
   registerData.value.name = '';
@@ -74,6 +75,9 @@ const loginRules=reactive(
         // { required: true, message: '请输入手机号', trigger: 'blur' },
         { pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
       ],
+      role: [
+        { required: true, message: '请选择用户类型', trigger: 'change' }
+      ]
     }
 )
 const ToLogin = async (form: any | undefined) => {
@@ -86,10 +90,10 @@ const ToLogin = async (form: any | undefined) => {
         return;
       }
       const temp={...loginData.value};
-      // temp.pass=Md5(loginData.value.pass).toString();
+      temp.pass=Md5(loginData.value.pass).toString();
       console.log('temp', temp);
       request.post('/user/login', temp).then((res) => {
-        // console.log(res);
+        console.log(res);
         //TODO: FIX
         const id=res.data.id;
         const token = res.data.token;
@@ -99,7 +103,10 @@ const ToLogin = async (form: any | undefined) => {
         localStorage.setItem('token', token);
         store.dispatch('saveUserInfo', userinfo);
         console.log('userinfo::', userinfo);
-        router.push('/consumer');
+
+        if(role === 'MERCHANT') router.push('/merchant');
+        else router.push('/consumer');
+
       }).catch((error) => {
         console.log(error);
         ElMessage.error('登录失败');
@@ -152,6 +159,12 @@ const ToRegister = async (form: any | undefined) => {
           </el-form-item>
           <el-form-item label="密码" prop="pass">
             <el-input v-model="loginData.pass" type="password" placeholder="请输入密码"></el-input>
+          </el-form-item>
+          <el-form-item label="用户类型" prop="role">
+            <el-radio-group v-model="loginData.role">
+              <el-radio value="CONSUMER" size="large" >用户</el-radio>
+              <el-radio value="MERCHANT" size="large">商家</el-radio>
+            </el-radio-group>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="ToLogin(loginFormRef)">登录</el-button>

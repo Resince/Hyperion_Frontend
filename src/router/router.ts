@@ -1,5 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import LoginRegister from "@/components/Login/LoginRegister.vue"
+import store from "@/store";
 
 const routes = [
     {
@@ -49,5 +50,19 @@ const router = createRouter({
     history: createWebHistory(),
     routes
 })
+
+router.beforeEach((to,from,next)=> {
+    const isLoggedIn = Boolean(localStorage.getItem('token'));
+    console.log('isLoggedIn:',isLoggedIn);
+    const userRole = store.state.userInfo?.role;
+    console.log('userRole:',userRole);
+
+    if (!isLoggedIn && to.path !== '/login') {
+        next('/login');
+    } else {
+        next();
+    }
+});
+
 
 export default router
