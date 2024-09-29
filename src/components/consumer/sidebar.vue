@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import { Document, Menu as IconMenu, Location, Setting } from '@element-plus/icons-vue';
 
-const route = useRoute();
 const router = useRouter();
 
 interface Props {
@@ -53,15 +52,21 @@ onMounted(() => {
           <span>商品</span>
         </el-menu-item>
         <el-menu-item index="2" @click="handleMenuClick('/consumer/trolly', '2')">
-          <el-icon><document /></el-icon>
+          <el-icon>
+            <document />
+          </el-icon>
           <span>购物车</span>
         </el-menu-item>
         <el-menu-item index="3" @click="handleMenuClick('/consumer/orders', '3')">
-          <el-icon><setting /></el-icon>
+          <el-icon>
+            <setting />
+          </el-icon>
           <span>订单</span>
         </el-menu-item>
         <el-menu-item index="4" @click="handleMenuClick('/consumer/profile', '4')">
-          <el-icon><location /></el-icon>
+          <el-icon>
+            <location />
+          </el-icon>
           <span>个人信息</span>
         </el-menu-item>
       </el-menu>
