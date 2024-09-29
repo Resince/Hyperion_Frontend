@@ -1,53 +1,112 @@
-import {createRouter, createWebHistory} from 'vue-router'
-import LoginRegister from "@/components/Login/LoginRegister.vue"
+import LoginRegister from "@/views/login/index.vue";
+import ConsumerLayout from "@/layouts/consumerLayout/index.vue";
+import ConsumerHome from "@/views/consumer/home/index.vue";
 
 const routes = [
     {
-        path: '/',
-        redirect: '/login',
-        // component: LoginRegister
+        path: "/",
+        redirect: "/login",
     },
     {
-        path: '/login',
-        name: 'Login',
-        component: LoginRegister
+        path: "/login",
+        name: "LoginRegister",
+        component: LoginRegister,
     },
     {
-        path: '/consumer',
-        name: 'Consumer',
-        component: () => import('@/components/consumer/consumer.vue'),
-        // component: ()=> import ('@/layout/index.vue'),
-        redirect: '/consumer/profile',
+        path: "/consumer",
+        name: "ConsumerLayout",
+        component: ConsumerLayout,
+        meta: {
+            role: "consumer",
+        },
         children: [
             {
-                path: 'profile',
-                name: 'Profile',
-                component: () => import('@/components/consumer/profile.vue')
+                path: "",
+                name: "ConsumerHome",
+                component: ConsumerHome,
             },
             {
-                path: 'orders',
-                name: 'Orders',
-                component: () => import('@/components/consumer/orders.vue')
+                path: "shoppinglist",
+                name: "ShoppingList",
+                component: () =>
+                    import("@/views/consumer/shoppingList/index.vue"),
             },
             {
-                path: 'trolly',
-                name: 'Trolly',
-                component: () => import('@/components/consumer/trolly.vue')
+                path: "profile",
+                name: "Profile",
+                component: () => import("@/views/consumer/profile/index.vue"),
             },
             {
-                path: 'shop',
-                name: 'Shop',
-                component: () => import('@/components/consumer/shop.vue')
+                path: "goodsdetails",
+                name: "GoodsDetails",
+                component: () =>
+                    import("@/views/consumer/goodsDetails/index.vue"),
+            },
+        ],
+    },
+    {
+        path: "/merchant",
+        name: "ManagerLayout",
+        component: () => import("@/layouts/managerLayout/index.vue"),
+        meta: {
+            role: "merchant",
+        },
+        children: [
+            {
+                path: "",
+                name: "MerchantHome",
+                component: () => import("@/views/merchant/home/index.vue"),
+            },
+            {
+                path: "commodityManage",
+                name: "CommodityManage",
+                component: () =>
+                    import("@/views/merchant/commodityManage/index.vue"),
+            },
+            {
+                path: "orderManage",
+                name: "OrderNanage",
+                component: () =>
+                    import("@/views/merchant/orderManage/index.vue"),
+            },
+            {
+                path: "orderdetails",
+                name: "OrderDetails",
+                component: () =>
+                    import("@/views/merchant/orderDetails/index.vue"),
+            },
+        ],
+    },
+    {
+        path: "/admin",
+        name: "ManagerLayout",
+        component: () => import("@/layouts/managerLayout/index.vue"),
+        meta: {
+            role: "admin",
+        },
+        children: [
+            {
+                path: "merchantmanage",
+                name: "MerchantManage",
+                component: () =>
+                    import("@/views/admin/merchantManage/index.vue"),
+            },
+            {
+                path: "usermanage",
+                name: "UserManage",
+                component: () => import("@/views/admin/userManage/index.vue"),
+            },
+        ],
+    },
+    {
+        path: "/:pathMatch(.*)*",
+        redirect: "/404",
+    },
+    {
+        path: "/404",
+        name: "404",
+        component: () => import("@/views/404/index.vue"),
+    },
+];
 
-            }
-        ]
-    }
-]
-
-
-const router = createRouter({
-    history: createWebHistory(),
-    routes
-})
-
-export default router
+export default routes;

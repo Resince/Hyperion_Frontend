@@ -1,21 +1,19 @@
 <script setup lang="ts">
-import store  from '@/store'
-import { ElMessageBox, ElMessage } from 'element-plus'
-import {ref, reactive, onMounted, onBeforeUnmount, computed} from 'vue'
-import {Document, Goods, Location, Setting, ShoppingCart, Ticket, Tickets} from "@element-plus/icons-vue";
-import {state} from "sucrase/dist/types/parser/traverser/base";
+import store from '@/store'
+import { ref, onMounted, computed } from 'vue'
+import { Goods, Setting, ShoppingCart, Tickets } from "@element-plus/icons-vue";
 import router from "@/router/router";
 
 
 //data
-const consumerMenu=[
+const consumerMenu = [
   {
-    title:"商品",
+    title: "商品",
     path: '/consumer/shop',
     icon: Goods
   },
   {
-    title:"购物车",
+    title: "购物车",
     path: '/consumer/trolly',
     icon: ShoppingCart
   },
@@ -26,12 +24,12 @@ const consumerMenu=[
   },
   {
     title: "个人信息",
-    path : '/consumer/profile',
+    path: '/consumer/profile',
     icon: Setting
   },
 ]
 
-const merchantMenu=[
+const merchantMenu = [
   {
     title: '商品管理',
     path: '/merchant/goods'
@@ -46,7 +44,7 @@ const merchantMenu=[
   }
 ]
 
-const adminMenu=[
+const adminMenu = [
   {
     title: '用户管理',
     path: '/admin/userlist'
@@ -57,7 +55,7 @@ const adminMenu=[
   }
 ]
 
-const role=ref(store.state.userInfo?.role);
+const role = ref(store.state.userInfo?.role);
 
 //activeIndex 用于记录当前激活的菜单项
 const activeIndex = ref('1');
@@ -85,7 +83,7 @@ const setActiveIndex = () => {
 };
 
 //menu 用于根据角色返回不同的菜单
-const menu= computed(()=>{
+const menu = computed(() => {
   switch (role) {
     case 'consumer':
       return consumerMenu;
@@ -100,31 +98,26 @@ const menu= computed(()=>{
 
 //处理菜单点击事件
 const handleMenuClick = (path: string) => {
-    sessionStorage.setItem('activePath', path);
-    router.push(path);
+  sessionStorage.setItem('activePath', path);
+  router.push(path);
 };
 </script>
 
 <template>
   <el-container class="sidebar-container">
-  <el-row align="top">
-    <el-col :span="24" >
-      <h5 class="mb-2">Welcome {{ store.state.userInfo?.name }}</h5>
-      <el-menu :default-active="activeIndex"  background-color="#22aaee"
-               text-color="#fff" router="true" >
-        <el-menu-item
-            v-for="item in menu"
-            :index="item.path"
-
-        >
-          <el-icon>
-            <component :is="item.icon" />
-          </el-icon>
-          <span>{{ item.title }}</span>
-        </el-menu-item>
-      </el-menu>
-    </el-col>
-  </el-row>
+    <el-row align="top">
+      <el-col :span="24">
+        <h5 class="mb-2">Welcome {{ store.state.userInfo?.name }}</h5>
+        <el-menu :default-active="activeIndex" background-color="#22aaee" text-color="#fff" router="true">
+          <el-menu-item v-for="item in menu" :index="item.path">
+            <el-icon>
+              <component :is="item.icon" />
+            </el-icon>
+            <span>{{ item.title }}</span>
+          </el-menu-item>
+        </el-menu>
+      </el-col>
+    </el-row>
   </el-container>
 </template>
 
@@ -136,16 +129,14 @@ const handleMenuClick = (path: string) => {
   position: fixed;
   overflow-y: auto;
 }
-
 </style>
 
 <style lang="less">
-
 .el-menu {
   padding: 20px 0 0 0px;
   background-color: #445566;
 
-  border:0!important;
+  border: 0 !important;
 }
 
 .el-menu-item {
@@ -153,7 +144,9 @@ const handleMenuClick = (path: string) => {
   border-radius: 10px;
   border-right: none;
   background-color: #445566;
-  outline: none; /* Remove any focus outline */
-  box-shadow: none; /* Remove any box-shadow */
+  outline: none;
+  /* Remove any focus outline */
+  box-shadow: none;
+  /* Remove any box-shadow */
 }
 </style>
