@@ -6,7 +6,6 @@ import Siderbar from './components/siderbar.vue';
 
 <template>
     <div class="consumerLayout-layout">
-        <el-container>
             <Siderbar />
             <el-container>
                 <Header>Header</Header>
@@ -14,15 +13,14 @@ import Siderbar from './components/siderbar.vue';
                     <router-view />
                 </el-main>
             </el-container>
-        </el-container>
     </div>
 </template>
 
 <style scoped lang="scss">
-div {
+.consumerLayout-layout {
     display: flex;
-    margin: auto;
 
+    width: 100%;
     h1 {
         font-size: larger;
     }

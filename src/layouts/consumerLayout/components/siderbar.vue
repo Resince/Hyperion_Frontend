@@ -97,7 +97,6 @@ const menu = computed(() => {
 </script>
 
 <template>
-    <el-aside>
         <el-container class="sidebar-container">
             <el-row align="top">
                 <el-col :span="24">
@@ -113,7 +112,6 @@ const menu = computed(() => {
                 </el-col>
             </el-row>
         </el-container>
-    </el-aside>
 </template>
 
 <style scoped lang="scss">
@@ -135,7 +133,6 @@ const menu = computed(() => {
 }
 
 .el-menu-item {
-
     border-radius: 10px;
     border-right: none;
     background-color: #445566;

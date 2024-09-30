@@ -85,7 +85,7 @@ const ToLogin = async (form: any | undefined) => {
   await form.validate((valid: boolean, fields: any) => {
     if (valid) {
       // console.log('loginData', loginData.value);
-      if (loginData.value.tel === '' || loginData.value.password === '') {
+      if (loginData.value.tel === '' || loginData.value.pass === '') {
         ElMessage.error('请输入手机号和密码');
         return;
       }
