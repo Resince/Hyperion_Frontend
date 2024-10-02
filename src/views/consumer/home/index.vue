@@ -1,20 +1,22 @@
 <script setup lang="ts">
-
+    import Card from "./components/card.vue";
+    const props = defineProps({
+        id: String,
+    });
 </script>
 
 <template>
-    <div>
-        <h1>this is a home view</h1>
+    <div class="grid-container">
+        <Card />
     </div>
 </template>
 
 <style scoped lang="scss">
-div {
-    display: flex;
-    margin: auto;
-
-    h1 {
-        font-size: larger;
+    .grid-container {
+        display: grid;
+        grid-gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-auto-rows: 200px;
+        grid-auto-flow: dense;
     }
-}
 </style>

@@ -4,6 +4,10 @@ import routes from "./router";
 const router = createRouter({
     history: createWebHistory(),
     routes,
+    scrollBehavior(_to, _from, _savedPosition) {
+        // 始终滚动到顶部
+        return { top: 0 };
+    },
 });
 
 // 路由守卫，让没有登录的登录

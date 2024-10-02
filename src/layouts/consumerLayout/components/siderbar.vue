@@ -1,147 +1,140 @@
 <script setup lang="ts">
-import store from '@/store'
-import { ref, onMounted, computed } from 'vue'
-import { Goods, Setting, ShoppingCart, Tickets } from "@element-plus/icons-vue";
+    import store from "@/store";
+    import {
+        Goods,
+        Setting,
+        ShoppingCart,
+        Tickets,
+    } from "@element-plus/icons-vue";
+    import { onMounted } from "vue";
+    import { useRoute, useRouter } from "vue-router";
 
+    // todo:
+    // 使用：该页面跳转传递参数 id 该参数代表不同的类别
+    // 利用参数对后端返回的数据进行分类
+    // 商品页面，对数进行分类并进行展示和排行
 
-//data
-const consumerMenu = [
-    {
-        title: "商品",
-        path: '/consumer/shop',
-        icon: Goods
-    },
-    {
-        title: "购物车",
-        path: '/consumer/trolly',
-        icon: ShoppingCart
-    },
-    {
-        title: "订单",
-        path: '/consumer/orders',
-        icon: Tickets
-    },
-    {
-        title: "个人信息",
-        path: '/consumer/profile',
-        icon: Setting
-    },
-]
+    //data
+    const category = [
+        {
+            title: "新加入",
+            path: "/consumer/home/:new",
+            icon: Goods,
+        },
+        {
+            title: "服装",
+            path: "/consumer/home/:clothes",
+            icon: Goods,
+        },
+        {
+            title: "数码",
+            path: "/consumer/home/:digtal",
+            icon: Goods,
+        },
+        {
+            title: "家居",
+            path: "/consumer/home/:furniture",
+            icon: Goods,
+        },
+        {
+            title: "美妆",
+            path: "/consumer/home/:cosmetic",
+            icon: Goods,
+        },
+        {
+            title: "食品",
+            path: "/consumer/home/:food",
+            icon: Goods,
+        },
+        {
+            title: "图书",
+            path: "/consumer/home/:books",
+            icon: Goods,
+        },
+    ];
 
-const merchantMenu = [
-    {
-        title: '商品管理',
-        path: '/merchant/goods'
-    },
-    {
-        title: '订单管理',
-        path: '/merchant/orders'
-    },
-    {
-        title: '店铺信息',
-        path: '/merchant/detail'
-    }
-]
+    const isInvalidPath = () => {
+        const path = useRoute().path;
+        console.log(path);
 
-const adminMenu = [
-    {
-        title: '用户管理',
-        path: '/admin/userlist'
-    },
-    {
-        title: '商家管理',
-        path: '/admin/merchantlist'
-    }
-]
+        if (path.split("/")[2] === "home")
+            return category.filter((item) => item.path === path).length === 0;
+        else return false;
+    };
 
-const role = ref(store.state.userInfo?.role);
+    const router = useRouter();
 
-//activeIndex 用于记录当前激活的菜单项
-const activeIndex = ref('1');
-onMounted(() => {
-    console.log('mounted');
-    setActiveIndex();
-});
-const setActiveIndex = () => {
-    const savedPath = sessionStorage.getItem('activePath');
-    if (savedPath) {
-        switch (savedPath) {
-            case 'consumer/profile':
-                activeIndex.value = '4';
-                break;
-            case 'consumer/orders':
-                activeIndex.value = '3';
-                break;
-            case 'consumer/shop':
-                activeIndex.value = '1';
-                break;
-            default:
-                activeIndex.value = '1';
+    onMounted(() => {
+        if (isInvalidPath()) {
+            router.push({ name: "404" });
         }
-    }
-};
-
-//menu 用于根据角色返回不同的菜单
-const menu = computed(() => {
-    switch (role) {
-        case 'consumer':
-            return consumerMenu;
-        case 'merchant':
-            return merchantMenu;
-        case 'admin':
-            return adminMenu;
-        default:
-            return consumerMenu;
-    }
-})
+    });
 </script>
 
 <template>
-    <el-aside>
-        <el-container class="sidebar-container">
-            <el-row align="top">
-                <el-col :span="24">
-                    <h5 class="mb-2">Welcome {{ store.state.userInfo?.name }}</h5>
-                    <el-menu :default-active="activeIndex" background-color="#22aaee" text-color="#fff" router="true">
-                        <el-menu-item v-for="item in menu" :index="item.path">
-                            <el-icon>
-                                <component :is="item.icon" />
-                            </el-icon>
-                            <span>{{ item.title }}</span>
-                        </el-menu-item>
-                    </el-menu>
-                </el-col>
-            </el-row>
-        </el-container>
+    <el-aside class="sidebar-container">
+        <div class="logo">
+            <svg
+                viewBox="0 0 512 512"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    fill="currentColor"
+                    d="M507.606 371.054a187.217 187.217 0 00-23.051-19.606c-17.316 19.999-37.648 36.808-60.572 50.041-35.508 20.505-75.893 31.452-116.875 31.711 21.762 8.776 45.224 13.38 69.396 13.38 49.524 0 96.084-19.286 131.103-54.305a15 15 0 004.394-10.606 15.028 15.028 0 00-4.395-10.615zM27.445 351.448a187.392 187.392 0 00-23.051 19.606C1.581 373.868 0 377.691 0 381.669s1.581 7.793 4.394 10.606c35.019 35.019 81.579 54.305 131.103 54.305 24.172 0 47.634-4.604 69.396-13.38-40.985-.259-81.367-11.206-116.879-31.713-22.922-13.231-43.254-30.04-60.569-50.039zM103.015 375.508c24.937 14.4 53.928 24.056 84.837 26.854-53.409-29.561-82.274-70.602-95.861-94.135-14.942-25.878-25.041-53.917-30.063-83.421-14.921.64-29.775 2.868-44.227 6.709-6.6 1.576-11.507 7.517-11.507 14.599 0 1.312.172 2.618.512 3.885 15.32 57.142 52.726 100.35 96.309 125.509zM324.148 402.362c30.908-2.799 59.9-12.454 84.837-26.854 43.583-25.159 80.989-68.367 96.31-125.508.34-1.267.512-2.573.512-3.885 0-7.082-4.907-13.023-11.507-14.599-14.452-3.841-29.306-6.07-44.227-6.709-5.022 29.504-15.121 57.543-30.063 83.421-13.588 23.533-42.419 64.554-95.862 94.134zM187.301 366.948c-15.157-24.483-38.696-71.48-38.696-135.903 0-32.646 6.043-64.401 17.945-94.529-16.394-9.351-33.972-16.623-52.273-21.525-8.004-2.142-16.225 2.604-18.37 10.605-16.372 61.078-4.825 121.063 22.064 167.631 16.325 28.275 39.769 54.111 69.33 73.721zM324.684 366.957c29.568-19.611 53.017-45.451 69.344-73.73 26.889-46.569 38.436-106.553 22.064-167.631-2.145-8.001-10.366-12.748-18.37-10.605-18.304 4.902-35.883 12.176-52.279 21.529 11.9 30.126 17.943 61.88 17.943 94.525.001 64.478-23.58 111.488-38.702 135.912zM266.606 69.813c-2.813-2.813-6.637-4.394-10.615-4.394a15 15 0 00-10.606 4.394c-39.289 39.289-66.78 96.005-66.78 161.231 0 65.256 27.522 121.974 66.78 161.231 2.813 2.813 6.637 4.394 10.615 4.394s7.793-1.581 10.606-4.394c39.248-39.247 66.78-95.96 66.78-161.231.001-65.256-27.511-121.964-66.78-161.231z"
+                />
+            </svg>
+        </div>
+        <el-menu
+            :default-active="$route.path"
+            :router="true"
+        >
+            <el-menu-item
+                v-for="item in category"
+                :index="item.path"
+            >
+                <el-icon>
+                    <component :is="item.icon" />
+                </el-icon>
+                <span>{{ item.title }}</span>
+            </el-menu-item>
+        </el-menu>
     </el-aside>
 </template>
 
-<style scoped lang="scss">
-.sidebar-container {
-    height: 100vh;
-    width: 145px;
-    background-color: #445566;
-    position: fixed;
-    overflow-y: auto;
-}
-</style>
+<style lang="scss">
+    .sidebar-container {
+        height: 100vh;
+        width: 100%;
+        overflow-y: hidden;
+        background-color: $cus_white;
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        border-right: 1px solid $cus_line-grey;
 
-<style lang="less">
-.el-menu {
-    padding: 20px 0 0 0px;
-    background-color: #445566;
+        .logo {
+            margin: 10px;
+            padding-left: 30px;
+            svg {
+                width: 90px;
+                height: 90px;
+            }
+        }
 
-    border: 0 !important;
-}
-
-.el-menu-item {
-
-    border-radius: 10px;
-    border-right: none;
-    background-color: #445566;
-    outline: none;
-    /* Remove any focus outline */
-    box-shadow: none;
-    /* Remove any box-shadow */
-}
+        .el-menu {
+            width: 100%;
+            height: 100%;
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            border-right: 0px;
+            .el-menu-item {
+                padding-left: 40px !important;
+                width: 100%;
+                border-radius: 10px;
+                display: flex;
+                gap: 10px;
+            }
+        }
+    }
 </style>

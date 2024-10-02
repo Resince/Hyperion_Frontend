@@ -4,6 +4,11 @@ import ConsumerHome from "@/views/consumer/home/index.vue";
 
 const routes = [
     {
+        path: "/test",
+        name: "test",
+        component: () => import("@/views/consumer/home/components/card.vue"),
+    },
+    {
         path: "/",
         redirect: "/login",
     },
@@ -21,9 +26,10 @@ const routes = [
         },
         children: [
             {
-                path: "",
+                path: "home/:id",
                 name: "ConsumerHome",
                 component: ConsumerHome,
+                props: true,
             },
             {
                 path: "shoppinglist",

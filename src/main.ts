@@ -6,6 +6,7 @@ import "element-plus/dist/index.css";
 import router from "./router/index.ts";
 import store from "./store";
 import * as ElementPlusIconsVue from "@element-plus/icons-vue";
+import "@/styles/common.scss";
 
 const app = createApp(App);
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
