@@ -1,38 +1,35 @@
 <script setup lang="ts">
     import { reactive, ref } from "vue";
-    import request from "@/utils/request";
-    import { ElMessage } from "element-plus";
-    import store from "@/store";
+    import type { FormInstance } from "element-plus";
+    import { useStore } from "@/store";
 
     const activeTab = ref("login");
-    import Md5 from "crypto-js/md5";
-    import router from "@/router/router";
-    import { UserInfo } from "@/types/user";
-    const registerData = ref({
+    const registerData = reactive({
         name: "",
         tel: "",
         pass: "",
         email: "",
         confirmPassword: "",
-        role: "",
+        role: "CONSUMER",
     });
-    const loginData = ref({
-        tel: "",
-        pass: "",
-        role: "",
+    const loginData = reactive({
+        tel: "15279101234",
+        pass: "135sfsefsd",
+        role: "CONSUMER",
     });
-    const handleTabClick = (tab) => {
-        registerData.value.name = "";
-        registerData.value.tel = "";
-        registerData.value.pass = "";
-        registerData.value.email = "";
-        registerData.value.confirmPassword = "";
-        registerData.value.role = "";
+    const handleTabClick = () => {
+        registerData.name = "";
+        registerData.tel = "";
+        registerData.pass = "";
+        registerData.email = "";
+        registerData.confirmPassword = "";
+        registerData.role = "CONSUMER";
     };
-    function validateConfirmPassword(rule, value, callback) {
+
+    function validateConfirmPassword(_rule: any, value: any, callback: any) {
         if (value === "") {
             callback(new Error("请再次输入密码"));
-        } else if (value !== registerData.value.pass) {
+        } else if (value !== registerData.pass) {
             callback(new Error("两次输入密码不一致"));
         } else {
             callback();
@@ -80,10 +77,6 @@
             { required: true, message: "请选择用户类型", trigger: "change" },
         ],
     });
-
-    const loginFormRef = ref(null);
-    const registerFormRef = ref(null);
-
     const loginRules = reactive({
         tel: [
             // { required: true, message: '请输入手机号', trigger: 'blur' },
@@ -97,67 +90,30 @@
             { required: true, message: "请选择用户类型", trigger: "change" },
         ],
     });
-    const ToLogin = async (form: any | undefined) => {
-        if (!form) return;
-        await form.validate((valid: boolean, fields: any) => {
-            if (valid) {
-                // console.log('loginData', loginData.value);
-                if (loginData.value.tel === "" || loginData.value.pass === "") {
-                    ElMessage.error("请输入手机号和密码");
-                    return;
-                }
-                const temp = { ...loginData.value };
-                temp.pass = Md5(loginData.value.pass).toString();
-                console.log("temp", temp);
-                request
-                    .post("/user/login", temp)
-                    .then((res) => {
-                        console.log(res);
-                        //TODO: FIX
-                        const id = res.data.id;
-                        const token = res.data.token;
-                        const name = res.data.name;
-                        const role = res.data.role;
-                        const userinfo: UserInfo = { id, name, role, token };
-                        localStorage.setItem("token", token);
-                        store.dispatch("saveUserInfo", userinfo);
-                        console.log("userinfo::", userinfo);
 
-                        if (role === "MERCHANT") router.push("/merchant");
-                        else router.push("/consumer");
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                        ElMessage.error("登录失败");
-                    });
-            } else {
-                ElMessage.error("Wrong input");
-            }
+    const loginFormRef = ref<FormInstance>();
+    const registerFormRef = ref<FormInstance>();
+
+    const store = useStore();
+    const ToLogin = () =>
+        store.dispatch("loginModule/loginAction", {
+            form: loginFormRef.value,
+            payload: {
+                tel: loginData.tel,
+                password: loginData.pass,
+                role: loginData.role,
+            },
         });
-    };
-
-    const ToRegister = async (form: any | undefined) => {
-        if (!form) return;
-        await form.validate((valid: boolean, fields: any) => {
-            if (valid) {
-                const temp = { ...registerData.value };
-                console.log("registerData", registerData.value);
-                temp.pass = Md5(registerData.value.pass).toString();
-                // console.log("form: " ,form);
-                // console.log('test md5', registerData.value.pass);
-                console.log("temp", temp);
-                request
-                    .post("/user/register", temp)
-                    .then((res) => {
-                        console.log(res);
-                    })
-                    .catch((error) => {
-                        console.log(error);
-                        ElMessage.error("注册失败");
-                    });
-            } else {
-                ElMessage.error("Wrong input");
-            }
+    const ToRegister = () => {
+        store.dispatch("registerModule/registerAction", {
+            registerFormRef: registerFormRef.value,
+            payload: {
+                name: registerData.name,
+                tel: registerData.tel,
+                password: registerData.pass,
+                email: registerData.email,
+                role: registerData.role,
+            },
         });
     };
 </script>
@@ -170,7 +126,6 @@
                 alt="Description of image"
             />
         </div>
-
         <div class="loginregister-container">
             <el-tabs
                 v-model="activeTab"
@@ -227,7 +182,7 @@
                         <el-form-item>
                             <el-button
                                 type="primary"
-                                @click="ToLogin(loginFormRef)"
+                                @click="ToLogin"
                                 >登录</el-button
                             >
                         </el-form-item>
@@ -299,19 +254,21 @@
                                 <el-radio
                                     value="CONSUMER"
                                     size="large"
-                                    >用户</el-radio
                                 >
+                                    用户
+                                </el-radio>
                                 <el-radio
                                     value="MERCHANT"
                                     size="large"
-                                    >商家</el-radio
                                 >
+                                    商家
+                                </el-radio>
                             </el-radio-group>
                         </el-form-item>
                         <el-form-item>
                             <el-button
                                 type="primary"
-                                @click="ToRegister(registerFormRef)"
+                                @click="ToRegister"
                                 >注册</el-button
                             >
                         </el-form-item>

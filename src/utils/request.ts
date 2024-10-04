@@ -1,58 +1,52 @@
-import axios from 'axios'
-import {ElMessage} from "element-plus";
+import axios from "axios";
+import { ElMessage } from "element-plus";
+import { getToken, setToken } from "./token.ts";
 
-
-const request =axios.create({
-    baseURL: 'http://localhost:8080/',
+const request = axios.create({
+    baseURL: "http://127.0.0.1:4523/m1/5227230-0-default",
     timeout: 5000,
-    headers:{
-        'Content-Type': 'application/json'
+    headers: {
+        "Content-Type": "application/json",
     },
-
 });
 
 request.interceptors.request.use(
-    (config)=>{
+    (config) => {
         //如果是注册就不写token
-        if(config.url==='/user/register' || config.url==='/user/login'){
+        if (config.url === "/user/register" || config.url === "/user/login") {
             return config;
         }
-        const token=localStorage.getItem('token');
-        if(token){
-            console.log('token:',token);
-            config.headers.Authorization =`Bearer ${token}`;
+        const token = getToken();
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
     },
-    (error)=>{
-        console.log('request error:',error);
+    (error) => {
+        console.log("request error:", error);
         return Promise.reject(error);
     }
 );
 
 request.interceptors.response.use(
-    (response)=>{
-        // const {code,message,data}=response.data;
-        const res=response.data;
+    (response) => {
+        // const res = response.data;
 
-        if(res.code===0)
-        {
-            console.log('response:',res);
-            return res;
-        }else {
-            ElMessage({
-                message: res.msg || "Error",
-                type: "error",
-                duration: 5 * 1000,
-            });
-            return Promise.reject(new Error(res.msg || "Error"));
-        }
-        // return response;
+        // if (res.code === 0) {
+        //     console.log("response:", res);
+        //     return res;
+        // } else {
+        //     ElMessage({
+        //         message: res.msg || "Error",
+        //         type: "error",
+        //         duration: 5 * 1000,
+        //     });
+        //     return Promise.reject("0");
+        // }
+        return response.data;
     },
-    (error)=>{
-
-
-        console.log('response error:',error);
+    (error) => {
+        console.log("response error:", error);
         ElMessage({
             message: error.msg || "Error",
             type: "error",
@@ -78,7 +72,6 @@ request.interceptors.response.use(
         //     console.error('Unexpected Error:', error);
         // }
         return Promise.reject(error);
-
     }
 );
 

@@ -1,25 +1,26 @@
-import { createStore } from "vuex";
-import { UserInfo } from "@/types/user";
-import { ref } from "vue";
+import { createStore, Store, useStore as useVuexStore } from "vuex";
+import { IRootState, IRootWithModule } from "@/types/index";
+import loginModule from "./loginRegister/login";
+import registerModule from "./loginRegister/register";
 
-const userInfo = ref<UserInfo | null>(null);
-
-export default createStore({
-    state: {
-        userInfo: userInfo.value,
+const store = createStore<IRootState>({
+    state() {
+        return {
+            id: 0,
+            name: "",
+            role: "",
+        };
     },
-    mutations: {
-        setUserInfo(state, userInfo) {
-            state.userInfo = userInfo;
-        },
-    },
-    actions: {
-        saveUserInfo({ commit }, userInfo) {
-            commit("setUserInfo", userInfo);
-            console.log("saveUserInfo:", userInfo);
-        },
-    },
-    getters: {
-        getToken: (state) => state.userInfo?.token,
+    mutations: {},
+    actions: {},
+    modules: {
+        loginModule,
+        registerModule,
     },
 });
+
+export function useStore(): Store<IRootWithModule> {
+    return useVuexStore();
+}
+
+export default store;
