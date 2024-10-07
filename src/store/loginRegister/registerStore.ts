@@ -3,10 +3,9 @@ import { Module } from "vuex";
 import { IRegister, IRegisterRes } from "@/types/loginRegister/register";
 import { FormInstance } from "element-plus";
 import { ElMessage } from "element-plus";
-import { reqRegister } from "@/api/loginRegister";
+import { reqRegister } from "@/api/loginRegisterApi";
 import CryptoJS from "crypto-js";
 import router from "@/router/index";
-import { getError } from "@/utils/errorTable";
 
 interface IRegisterPayload {
     form: FormInstance | undefined;
@@ -66,9 +65,8 @@ const registerModule: Module<IRegisterRes, IRootState> = {
                 // 处理请求
                 try {
                     const regesiterRes = await reqRegister(payload);
-                    if (regesiterRes.code !== 0) {
-                        const message = getError(regesiterRes.code.toString());
-                        ElMessage.error(message);
+                    if (regesiterRes.code !== 0 || !regesiterRes.data) {
+                        return;
                     }
                     commit("changeId", regesiterRes.data.id);
                     commit("changeTelephone", regesiterRes.data.tel);

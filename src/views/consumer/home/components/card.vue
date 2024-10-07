@@ -1,131 +1,168 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+    import { IGoodsALLListItem } from "@/types/goods";
+    import { postShoppingList } from "@/api/shoppingListApi";
+    import { useRouter } from "vue-router";
+    const { data, size } = defineProps<{
+        data: IGoodsALLListItem;
+        size?: string;
+    }>();
+    const router = useRouter();
+    const handleAddShoppingList = () => {
+        // TODO: Add to shopping list
+        postShoppingList(data.id, 1);
+    };
+
+    const handlePurchase = () => {
+        // TODO : Purchase
+        // 跳转指详情页面
+        router.push(`/consumer/goodsdetails/:${data.id}`);
+    };
+</script>
 
 <template>
-    <figure>
-        <img
-            src="https://images.unsplash.com/photo-1541845157-a6d2d100c931?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=1350&amp;q=80"
-            alt=""
-        />
-    </figure>
-    <figure>
-        <img
-            src="https://images.unsplash.com/photo-1588282322673-c31965a75c3e?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=1351&amp;q=80"
-            alt=""
-        />
-    </figure>
-    <figure class="tall">
-        <img
-            src="https://images.unsplash.com/photo-1588117472013-59bb13edafec?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=500&amp;q=60"
-            alt=""
-        />
-    </figure>
-    <figure class="wide">
-        <img
-            src="https://images.unsplash.com/photo-1587588354456-ae376af71a25?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80"
-            alt=""
-        />
-    </figure>
-    <figure>
-        <img
-            src="https://images.unsplash.com/photo-1558980663-3685c1d673c4?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=1000&amp;q=60"
-            alt=""
-        />
-    </figure>
-    <figure class="tall">
-        <img
-            src="https://images.unsplash.com/photo-1588499756884-d72584d84df5?ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=2134&amp;q=80"
-            alt=""
-        />
-    </figure>
-    <figure class="big">
-        <img
-            src="https://images.unsplash.com/photo-1588492885706-b8917f06df77?ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=1951&amp;q=80"
-            alt=""
-        />
-    </figure>
-    <figure>
-        <img
-            src="https://images.unsplash.com/photo-1588247866001-68fa8c438dd7?ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=564&amp;q=80"
-            alt=""
-        />
-    </figure>
-    <figure class="wide">
-        <img
-            src="https://images.unsplash.com/photo-1586521995568-39abaa0c2311?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=1350&amp;q=80"
-            alt=""
-        />
-    </figure>
-    <figure class="big">
-        <img
-            src="https://images.unsplash.com/photo-1572914857229-37bf6ee8101c?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=1951&amp;q=80"
-            alt=""
-        />
-    </figure>
-    <figure class="tall">
-        <img
-            src="https://images.unsplash.com/photo-1588453862014-cd1a9ad06a12?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=634&amp;q=80"
-            alt=""
-        />
-    </figure>
-    <figure>
-        <img
-            src="https://images.unsplash.com/photo-1588414734732-660b07304ddb?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=675&amp;q=80"
-            alt=""
-        />
-    </figure>
-    <figure>
-        <img
-            src="https://images.unsplash.com/photo-1588224575346-501f5880ef29?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=700&amp;q=80"
-            alt=""
-        />
-    </figure>
-    <figure>
-        <img
-            src="https://images.unsplash.com/photo-1574798834926-b39501d8eda2?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=800&amp;q=80"
-            alt=""
-        />
-    </figure>
-    <figure>
-        <img
-            src="https://images.unsplash.com/photo-1547234935-80c7145ec969?ixlib=rb-1.2.1&amp;auto=format&amp;fit=crop&amp;w=1353&amp;q=80"
-            alt=""
-        />
-    </figure>
-    <figure class="wide">
-        <img
-            src="https://images.unsplash.com/photo-1588263823647-ce3546d42bfe?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=crop&amp;w=675&amp;q=80"
-            alt=""
-        />
-    </figure>
+    <div
+        class="card-container"
+        :class="[size]"
+    >
+        <div class="card-img">
+            <img
+                :src="data.coverUrl"
+                alt=""
+            />
+        </div>
+        <div class="card-box">
+            <div>
+                <button
+                    class="card-action"
+                    @click="handleAddShoppingList"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 576 512"
+                    >
+                        <path
+                            d="M24 0C10.7 0 0 10.7 0 24S10.7 48 24 48l45.5 0c3.8 0 7.1 2.7 7.9 6.5l51.6 271c6.5 34 36.2 58.5 70.7 58.5L488 384c13.3 0 24-10.7 24-24s-10.7-24-24-24l-288.3 0c-11.5 0-21.4-8.2-23.6-19.5L170.7 288l288.5 0c32.6 0 61.1-21.8 69.5-53.3l41-152.3C576.6 57 557.4 32 531.1 32L360 32l0 102.1 23-23c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9l-64 64c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l23 23L312 32 120.1 32C111 12.8 91.6 0 69.5 0L24 0zM176 512a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm336-48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0z"
+                        />
+                    </svg>
+                </button>
+                <div class="card-heading">{{ data.name }}</div>
+            </div>
+            <div class="card-text">
+                {{ data.desc }}
+            </div>
+            <div class="card-price">{{ data.price }}</div>
+            <button
+                class="card-button"
+                @click="handlePurchase"
+            >
+                Purchase
+            </button>
+        </div>
+    </div>
 </template>
 
 <style scoped lang="scss">
-    img {
-        max-width: 100%;
-        height: auto;
-        vertical-align: middle;
-        display: inline-block;
-    }
-    figure {
+    .card-container {
         display: flex;
+        flex-direction: column;
         justify-content: center;
-        align-items: center;
+        height: 380px;
+    }
+    .card-img {
+        .wide {
+            grid-column: 1 / span 2;
+        }
+        height: 200px;
+        width: 100%;
         img {
-            width: 100%;
-            height: 100%;
             object-fit: cover;
-            border-radius: 5px;
+            border-radius: 8px 8px 0px 0;
+            height: 100%;
+            width: 100%;
         }
     }
-    .wide {
-        grid-column: span 2;
+    .card-box {
+        flex: 1;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 2px;
     }
-    .tall {
-        grid-row: span 2;
+    .card-action {
+        position: relative;
+        float: right;
+        top: -15px;
+        right: 10px;
+        color: #e26d5c;
+        background: #fff;
+        border-radius: 100%;
+        padding: 15px;
+        font-size: 15px;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2),
+            0 1px 2px 0 rgba(0, 0, 0, 0.19);
+        svg {
+            width: 15px;
+            scale: 1.5;
+        }
     }
-    .big {
-        background-color: black;
-        grid-column: span 2;
-        grid-row: span 2;
+
+    .card-action:hover {
+        color: #fff;
+        background: #e26d5c;
+        animation: pulse 1.5s infinite;
+    }
+
+    .card-heading {
+        font-size: 18px;
+        font-weight: bold;
+        background: #fff;
+        padding: 5px 10px 0px;
+        text-align: left;
+    }
+
+    .card-text {
+        padding: 6px 10px;
+        background: #fff;
+        font-size: 14px;
+        color: #636262;
+    }
+
+    .card-price {
+        padding: 0px 10px;
+        background: #fff;
+        font-size: 17px;
+        color: #e26d5c;
+        font-weight: bold;
+    }
+
+    .card-button {
+        display: flex;
+        justify-content: center;
+        padding: 5px 0;
+        width: 100%;
+        background-color: $cus_yellow;
+        color: #fff;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .card-button:hover {
+        text-decoration: none;
+        background-color: $cus_yellow;
+        color: #fff;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(0.9);
+        }
+        70% {
+            transform: scale(1);
+            box-shadow: 0 0 0 50px rgba(90, 153, 212, 0);
+        }
+        100% {
+            transform: scale(0.9);
+            box-shadow: 0 0 0 0 rgba(90, 153, 212, 0);
+        }
     }
 </style>

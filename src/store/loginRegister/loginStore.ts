@@ -1,13 +1,13 @@
 import { IRootState } from "@/types/index.ts";
 import { ILogin, ILoginRes } from "@/types/loginRegister/login";
 import { Module } from "vuex";
-import { setToken } from "@/utils/token";
+import { setCache, setToken } from "@/utils/cache";
 import CryptoJS from "crypto-js";
-import { reqLogin } from "@/api/loginRegister";
+import { reqLogin } from "@/api/loginRegisterApi";
 import { ElMessage } from "element-plus";
-import { getError } from "@/utils/errorTable";
 import { FormInstance } from "element-plus";
 import router from "@/router/index";
+import { root } from "postcss";
 
 interface ILoginPayload {
     form: FormInstance | undefined;
@@ -25,6 +25,7 @@ const loginModule: Module<ILoginRes, IRootState> = {
     },
     mutations: {
         changeId(state, id: number) {
+            setCache("id", id);
             state.id = id;
         },
         changeTel(state, tel: string) {
@@ -49,16 +50,14 @@ const loginModule: Module<ILoginRes, IRootState> = {
                 payload.password = CryptoJS.MD5(payload.password).toString();
                 // 处理请求
                 const loginRes = await reqLogin(payload);
-                console.log("loginRes", loginRes);
-                if (loginRes.code !== 0) {
-                    console.log("loginRes.code", loginRes.code);
-                    const message = getError(loginRes.code.toString());
-                    ElMessage.error(message);
+                if (loginRes.code !== 0 || !loginRes.data) {
                     return;
                 }
+                setCache("role", payload.role);
                 commit("changeId", loginRes.data.id);
                 commit("changeTel", loginRes.data.tel);
                 commit("changeToken", loginRes.data.token);
+                await this.dispatch("initUserInfoAction",{root:true});
                 // 跳转
                 let pushPath = "";
                 switch (payload.role) {
@@ -70,8 +69,6 @@ const loginModule: Module<ILoginRes, IRootState> = {
                         break;
                     case "CONSUMER":
                         pushPath = "/consumer/home/:new";
-                        break;
-                    default:
                         break;
                 }
                 router.push(pushPath);

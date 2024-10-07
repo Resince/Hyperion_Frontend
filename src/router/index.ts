@@ -13,7 +13,7 @@ const router = createRouter({
 // 路由守卫，让没有登录的登录
 router.beforeEach(async (to, _from) => {
     const isAuthenticated = true;
-    const role = "consumer";
+    const role = "CONSUMER";
 
     if (
         // 需要鉴权的页面

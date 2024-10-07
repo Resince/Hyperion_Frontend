@@ -1,9 +1,18 @@
 import axios from "axios";
+import { getToken, removeToken } from "./cache.ts";
+import nProgress from "nprogress";
+import "nprogress/nprogress.css";
+import router from "@/router/index.ts";
 import { ElMessage } from "element-plus";
-import { getToken, setToken } from "./token.ts";
+import { getError } from "./errorTable.ts";
+
+// 暂时没有后端接口，所以这里的baseurl是空的
+const baseurl: string = import.meta.env.DEV
+    ? "http://127.0.0.1:4523/m1/5227230-0-default"
+    : "";
 
 const request = axios.create({
-    baseURL: "http://127.0.0.1:4523/m1/5227230-0-default",
+    baseURL: baseurl,
     timeout: 5000,
     headers: {
         "Content-Type": "application/json",
@@ -20,6 +29,7 @@ request.interceptors.request.use(
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+        nProgress.start();
         return config;
     },
     (error) => {
@@ -30,47 +40,30 @@ request.interceptors.request.use(
 
 request.interceptors.response.use(
     (response) => {
-        // const res = response.data;
-
-        // if (res.code === 0) {
-        //     console.log("response:", res);
-        //     return res;
-        // } else {
-        //     ElMessage({
-        //         message: res.msg || "Error",
-        //         type: "error",
-        //         duration: 5 * 1000,
-        //     });
-        //     return Promise.reject("0");
-        // }
+        // 对响应数据做点什么
+        const { code, message } = response.data;
+        if (code !== 0) {
+            console.log("loginRes.code", code);
+            const msg = message ? message : getError(code.toString());
+            ElMessage.error(msg);
+        }
+        nProgress.done();
         return response.data;
     },
     (error) => {
-        console.log("response error:", error);
-        ElMessage({
-            message: error.msg || "Error",
-            type: "error",
-            duration: 5 * 1000,
-        });
-        // 对响应错误做些什么，例如统一处理错误提示
-        // if (axios.isAxiosError(error)) {
-        //     console.error('Axios Error:', error.message);
-        //     if (error.response) {
-        //         // 请求已发出，但服务器响应的状态码不在 2xx 范围内
-        //         console.error('Response Data:', error.response.data);
-        //         console.error('Response Status:', error.response.status);
-        //         console.error('Response Headers:', error.response.headers);
-        //     } else if (error.request) {
-        //         // 请求已发出，但没有收到任何响应
-        //         console.error('Request:', error.request);
-        //     } else {
-        //         // 在设置请求时发生了一些错误
-        //         console.error('Error:', error.message);
-        //     }
-        // } else {
-        //     // 不是 AxiosError
-        //     console.error('Unexpected Error:', error);
-        // }
+        // 对响应错误做点什么
+        if (error.response?.status === 401) {
+            ElMessage.error("登录过期，请重新登录");
+            removeToken();
+            router.push("/login");
+        } else if (error.response?.status === 404) {
+            ElMessage.error("请求资源不存在");
+        } else if (error.response?.status === 400) {
+            ElMessage.error("请求有误");
+        } else {
+            ElMessage.error("请求失败");
+        }
+        nProgress.done();
         return Promise.reject(error);
     }
 );

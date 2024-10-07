@@ -22,14 +22,13 @@ const routes = [
         name: "ConsumerLayout",
         component: ConsumerLayout,
         meta: {
-            role: "consumer",
+            role: "CONSUMER",
         },
         children: [
             {
-                path: "home/:id",
+                path: "home/:category",
                 name: "ConsumerHome",
                 component: ConsumerHome,
-                props: true,
             },
             {
                 path: "shoppinglist",
@@ -43,7 +42,7 @@ const routes = [
                 component: () => import("@/views/consumer/profile/index.vue"),
             },
             {
-                path: "goodsdetails",
+                path: "goodsdetails/:id",
                 name: "GoodsDetails",
                 component: () =>
                     import("@/views/consumer/goodsDetails/index.vue"),
@@ -55,7 +54,7 @@ const routes = [
         name: "ManagerLayout",
         component: () => import("@/layouts/managerLayout/index.vue"),
         meta: {
-            role: "merchant",
+            role: "MERCHANT",
         },
         children: [
             {
@@ -88,7 +87,7 @@ const routes = [
         name: "ManagerLayout",
         component: () => import("@/layouts/managerLayout/index.vue"),
         meta: {
-            role: "admin",
+            role: "ADMIN",
         },
         children: [
             {

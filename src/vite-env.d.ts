@@ -5,3 +5,5 @@ declare module "*.vue" {
     const component: ComponentOptions | ComponentOptions["setup"];
     export default component;
 }
+declare module "nprogress";
+declare module "qs";

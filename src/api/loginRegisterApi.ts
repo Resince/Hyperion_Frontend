@@ -1,6 +1,6 @@
 import request from "@/utils/request";
-import { ILogin, ILoginRes } from "@/types/loginRegister/login";
-import { IRegister, IRegisterRes } from "@/types/loginRegister/register";
+import { ILogin, ILoginRes } from "@/types/login";
+import { IRegister, IRegisterRes } from "@/types/register";
 import { IDataType } from "@/types";
 
 export const reqLogin = (data: ILogin): Promise<IDataType<ILoginRes>> => {
