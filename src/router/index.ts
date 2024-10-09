@@ -3,28 +3,29 @@ import routes from "./router";
 import store from "../store";
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes,
-  scrollBehavior(_to, _from, _savedPosition) {
-    // 始终滚动到顶部
-    return {top: 0};
-  },
+    history: createWebHistory(),
+    routes,
+    scrollBehavior(_to, _from, _savedPosition) {
+        // 始终滚动到顶部
+        return { top: 0 };
+    },
 });
 
 // 路由守卫，让没有登录的登录
 router.beforeEach(async (to, _from) => {
-    console.log(to.fullPath);
-
-    const isAuthenticated = true;
+    if (to.meta.role === "ADMIN") {
+        return;
+    }
     if (store.getters.gRole === "") {
         await store.dispatch("initUserInfoAction");
     }
     const role = store.getters.gRole;
-    console.log(role);
+    const id = store.getters.gId;
+    const isAuthenticated = !!id;
     console.log(to.fullPath);
 
     if (
-        // 需要鉴权的页面
+        // 需要登录和鉴权的页面
         to.meta.role &&
         // 但是没有登录
         !isAuthenticated &&
@@ -33,7 +34,7 @@ router.beforeEach(async (to, _from) => {
     ) {
         return { name: "LoginRegister" };
     } else if (
-        // 登录鉴权
+        // 鉴权
         // 需要鉴权
         to.meta.role &&
         // 没有权限

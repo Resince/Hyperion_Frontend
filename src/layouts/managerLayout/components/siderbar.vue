@@ -1,19 +1,41 @@
 <script setup lang="ts">
-    import { ref } from "vue";
-    const isclose = ref(true);
-    const isActive = ref(false);
-    const toggleIsClose = () => {
-        isclose.value = !isclose.value;
+    import { useStore } from "@/store";
+    import { onMounted, PropType, ref } from "vue";
+    import { useRoute, useRouter } from "vue-router";
+    const props = defineProps({
+        isclose: Boolean,
+        sideMenuList: Array as PropType<sideMenuType[]>,
+    });
+    type sideMenuType = {
+        name: string;
+        icon: string;
+        link: string;
     };
-    const toggleIsActive = () => {
-        isActive.value = !isActive.value;
+    const activeIndex = ref(0);
+    const route = useRoute();
+    const toggleIsActive = (index: number) => {
+        activeIndex.value = index;
     };
+    const store = useStore();
+    const router = useRouter();
+    const handleLogout = () => {
+        store.commit("loginModule/logout");
+        router.push("/login");
+    };
+    onMounted(() => {
+        // 根据路由地址设置当前激活的菜单
+        if (!props.sideMenuList) return;
+        const index = props.sideMenuList.findIndex(
+            (item) => item.link === route.path
+        );
+        activeIndex.value = index;
+    });
 </script>
 
 <template>
     <div
         class="sidebar"
-        :class="{ close: isclose }"
+        :class="{ close: props.isclose }"
     >
         <a
             href="/merchant"
@@ -23,46 +45,40 @@
             <div class="logo-name"><span>Asmr</span>Prog</div>
         </a>
         <ul class="side-menu">
-            <li>
-                <a href="#"><i class="bx bxs-dashboard"></i>总览</a>
-            </li>
-            <li>
-                <a href="#"><i class="bx bx-store-alt"></i>商品</a>
-            </li>
             <li
-                :class="{ active: isActive }"
-                @click="toggleIsActive"
+                v-for="(item, index) in sideMenuList"
+                :key="index"
+                :class="{ active: index == activeIndex }"
             >
-                <a href="#"><i class="bx bx-analyse"></i>交易</a>
-            </li>
-            <li>
-                <a href="#"><i class="bx bx-message-square-dots"></i>交易</a>
-            </li>
-            <li>
-                <a href="#"><i class="bx bx-group"></i>Users</a>
-            </li>
-            <li>
-                <a href="#"><i class="bx bx-cog"></i>Settings</a>
+                <a
+                    @click="toggleIsActive(index)"
+                    v-bind:href="item.link"
+                    ><i
+                        class="bx"
+                        :class="item.icon"
+                    ></i
+                    ><span>{{ item.name }}</span></a
+                >
             </li>
         </ul>
         <ul class="side-menu">
             <li>
                 <a
-                    href="#"
                     class="logout"
+                    @click="handleLogout"
                 >
                     <i class="bx bx-log-out-circle"></i>
-                    Logout
+                    <span>Logout</span>
                 </a>
             </li>
         </ul>
     </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
     @import url(https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css);
     .sidebar {
-        position: sticky;
+        position: fixed;
         top: 0;
         left: 0;
         background: $light;
@@ -108,6 +124,7 @@
                 margin-left: 6px;
                 border-radius: 48px 0 0 48px;
                 padding: 4px;
+                margin-top: 10px;
                 &.active {
                     background: $grey;
                     position: relative;
@@ -144,7 +161,7 @@
                     display: flex;
                     align-items: center;
                     border-radius: 48px;
-                    font-size: 16px;
+                    font-size: 17px;
                     color: $dark;
                     white-space: nowrap;
                     overflow-x: hidden;
@@ -155,6 +172,9 @@
                         font-size: 1.6rem;
                         justify-content: center;
                     }
+                    span {
+                        margin-left: 6px;
+                    }
                     &.logout {
                         color: $danger;
                     }
@@ -164,6 +184,11 @@
         &.close .side-menu li a {
             width: calc(48px - (4px * 2));
             transition: all 0.3s ease;
+        }
+        & > .side-menu:last-child {
+            position: absolute;
+            bottom: 10px;
+            left: 5px;
         }
     }
 </style>

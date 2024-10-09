@@ -1,7 +1,19 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+    defineProps({
+        width: {
+            type: String,
+            default: "20px",
+        },
+        height: {
+            type: String,
+            default: "20px",
+        },
+    });
+</script>
 
 <template>
     <svg
+        :style="{ width, height }"
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 448 512"
         class="normal"
@@ -12,9 +24,4 @@
     </svg>
 </template>
 
-<style scoped lang="scss">
-    svg {
-        width: 20px;
-        height: 20px;
-    }
-</style>
+<style scoped lang="scss"></style>

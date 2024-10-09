@@ -1,7 +1,7 @@
 import { IRootState } from "@/types/index.ts";
 import { ILogin, ILoginRes } from "@/types/login";
 import { Module } from "vuex";
-import { setCache, setToken } from "@/utils/cache";
+import { removeCache, removeToken, setCache, setToken } from "@/utils/cache";
 import CryptoJS from "crypto-js";
 import { reqLogin } from "@/api/loginRegisterApi";
 import { ElMessage } from "element-plus";
@@ -35,6 +35,14 @@ const loginModule: Module<ILoginRes, IRootState> = {
             setToken(token);
             state.token = token;
         },
+        logout(state) {
+            state.id = 0;
+            state.tel = "";
+            state.token = "";
+            removeToken();
+            removeCache("role");
+            removeCache("id");
+        },
     },
     actions: {
         async loginAction({ commit }, { form, payload }: ILoginPayload) {
@@ -56,7 +64,7 @@ const loginModule: Module<ILoginRes, IRootState> = {
                 commit("changeId", loginRes.data.id);
                 commit("changeTel", loginRes.data.tel);
                 commit("changeToken", loginRes.data.token);
-                await this.dispatch("initUserInfoAction",{root:true});
+                await this.dispatch("initUserInfoAction", { root: true });
                 // 跳转
                 let pushPath = "";
                 switch (payload.role) {

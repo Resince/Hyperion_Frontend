@@ -1,48 +1,70 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+    import { ref } from "vue";
+    import userIcon from "@/assets/icons/userIcon.vue";
+    defineProps({
+        searchPlaceholder: {
+            type: String,
+            default: "Search...",
+        },
+    });
+    // TODO 之后完善搜索逻辑
+    const search = ref("");
+    const handleSearch = () => {
+        console.log(search.value);
+    };
+    const data = ref({
+        bellCount: 0,
+    });
+    const handleBellClick = () => {
+        console.log("bell");
+    };
+    const handleProfile = () => {
+        console.log("profile");
+    };
+</script>
 
 <template>
     <nav class="content-nav">
-        <i class="bx bx-menu"></i>
-        <form action="#">
+        <i
+            class="bx bx-menu"
+            @click="$emit('toggleSidebar')"
+        ></i>
+        <form>
             <div class="form-input">
                 <input
                     type="search"
-                    placeholder="Search..."
+                    :placeholder="searchPlaceholder"
+                    v-model="search"
                 />
                 <button
                     class="search-btn"
                     type="submit"
+                    @click="handleSearch"
                 >
                     <i class="bx bx-search"></i>
                 </button>
             </div>
         </form>
-        <input
-            type="checkbox"
-            id="theme-toggle"
-            hidden
-        />
-        <label
-            for="theme-toggle"
-            class="theme-toggle"
-        ></label>
         <a
-            href="#"
+            @click="handleBellClick"
             class="notif"
         >
             <i class="bx bx-bell"></i>
-            <span class="count">12</span>
+            <span class="count">{{ data.bellCount }}</span>
         </a>
         <a
-            href="#"
             class="profile"
+            @click="handleProfile"
         >
-            <img src="" />
+            <userIcon
+                width="25px"
+                height="25px"
+            />
         </a>
     </nav>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
     nav.content-nav {
         height: 56px;
         background: $light;
@@ -67,7 +89,7 @@
         a {
             color: $dark;
         }
-        .bx &.bx-menu {
+        .bx.bx-menu {
             cursor: pointer;
             color: $dark;
         }
@@ -126,34 +148,9 @@
                 justify-content: center;
             }
         }
-        .profile img {
-            width: 36px;
-            height: 36px;
-            object-fit: cover;
-            border-radius: 50%;
-        }
-        .theme-toggle {
-            display: block;
-            min-width: 50px;
-            height: 25px;
-            background: $grey;
+        .profile {
             cursor: pointer;
-            position: relative;
-            border-radius: 25px;
-            &::before {
-                content: "";
-                position: absolute;
-                top: 2px;
-                left: 2px;
-                bottom: 2px;
-                width: calc(25px - 4px);
-                background: $primary;
-                border-radius: 50%;
-                transition: all 0.3s ease;
-            }
-        }
-        #theme-toggle &:checked + .theme-toggle &::before {
-            left: calc(100% - (25px - 4px) - 2px);
+            padding-bottom: 6px;
         }
     }
 </style>

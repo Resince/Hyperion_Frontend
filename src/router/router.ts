@@ -96,12 +96,6 @@ const routes = [
         },
         children: [
             {
-                path: "merchantmanage",
-                name: "MerchantManage",
-                component: () =>
-                    import("@/views/admin/merchantManage/index.vue"),
-            },
-            {
                 path: "usermanage",
                 name: "UserManage",
                 component: () => import("@/views/admin/userManage/index.vue"),

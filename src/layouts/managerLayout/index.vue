@@ -1,19 +1,41 @@
 <script setup lang="ts">
+    import { ref } from "vue";
     import Header from "./components/header.vue";
     import Siderbar from "./components/siderbar.vue";
+    import { useRoute } from "vue-router";
+    const route = useRoute();
+    const isclose = ref(false);
+    const toggleSidebar = () => {
+        isclose.value = !isclose.value;
+    };
+    const path = route.path;
+    const sliderListMerchant = [
+        { name: "总览", icon: "bxs-dashboard", link: "/merchant" },
+        { name: "商品", icon: "bxs-store", link: "/merchant/commodityManage" },
+        { name: "交易", icon: "bxs-analyse", link: "/merchant/orderManage" },
+    ];
+    const sliderListAdmin = [
+        { name: "用户管理", icon: "bxs-user", link: "/admin/userManage" },
+    ];
+    const sliderList = path.includes("merchant")
+        ? sliderListMerchant
+        : sliderListAdmin;
 </script>
 
 <template>
     <div class="common-layout">
-        <Siderbar />
-        <div class="">
-            <Header />
-            <router-view class="content" />
+        <Siderbar
+            :isclose="isclose"
+            :sideMenuList="sliderList"
+        />
+        <div class="content">
+            <Header @toggleSidebar="toggleSidebar" />
+            <router-view />
         </div>
     </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
     .bx {
         font-size: 1.7rem;
     }
@@ -32,7 +54,6 @@
         height: 100vh;
         width: 100vw;
         flex-direction: row;
-
     }
     .content {
         position: relative;

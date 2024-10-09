@@ -5,7 +5,6 @@ import registerModule from "./registerStore";
 import { getCache, getToken, setCache } from "@/utils/cache";
 import { updateUserInfoAPI, getUserInfoAPI } from "@/api/userinfoApi";
 import { ElMessage } from "element-plus";
-import router from "@/router";
 import ShoppingListMudule from "./shoppingListStore";
 import goodsStoreMudule from "./goodStore";
 
@@ -45,8 +44,6 @@ const store = createStore<IRootState>({
             const token = getToken();
             const role = getCache("role");
             if (!token || !id || !role) {
-                ElMessage("登录失效,请重新登录");
-                router.push("/login");
                 return;
             }
             const res = await getUserInfoAPI(id);
@@ -72,6 +69,9 @@ const store = createStore<IRootState>({
     getters: {
         gRole(state) {
             return state.role;
+        },
+        gId(state) {
+            return state.id;
         },
     },
     modules: {
