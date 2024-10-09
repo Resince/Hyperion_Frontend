@@ -1,5 +1,5 @@
 import { IRootState } from "@/types/index.ts";
-import { ILogin, ILoginRes } from "@/types/loginRegister/login";
+import { ILogin, ILoginRes } from "@/types/login";
 import { Module } from "vuex";
 import { setCache, setToken } from "@/utils/cache";
 import CryptoJS from "crypto-js";
@@ -7,7 +7,6 @@ import { reqLogin } from "@/api/loginRegisterApi";
 import { ElMessage } from "element-plus";
 import { FormInstance } from "element-plus";
 import router from "@/router/index";
-import { root } from "postcss";
 
 interface ILoginPayload {
     form: FormInstance | undefined;

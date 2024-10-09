@@ -31,7 +31,6 @@
 <style scoped lang="scss">
     .headerwrapper {
         background-color: $cus_background;
-        height: 80px;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -39,7 +38,6 @@
         z-index: 100;
         position: sticky;
         top: 0px;
-        z-index: 100;
     }
 
     .header-navigation {

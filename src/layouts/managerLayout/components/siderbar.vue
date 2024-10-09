@@ -1,146 +1,169 @@
 <script setup lang="ts">
-import store from '@/store'
-import { ref, onMounted, computed } from 'vue'
-import { Goods, Setting, ShoppingCart, Tickets } from "@element-plus/icons-vue";
-
-//data
-const consumerMenu = [
-    {
-        title: "商品",
-        path: '/consumer/shop',
-        icon: Goods
-    },
-    {
-        title: "购物车",
-        path: '/consumer/trolly',
-        icon: ShoppingCart
-    },
-    {
-        title: "订单",
-        path: '/consumer/orders',
-        icon: Tickets
-    },
-    {
-        title: "个人信息",
-        path: '/consumer/profile',
-        icon: Setting
-    },
-]
-
-const merchantMenu = [
-    {
-        title: '商品管理',
-        path: '/merchant/goods'
-    },
-    {
-        title: '订单管理',
-        path: '/merchant/orders'
-    },
-    {
-        title: '店铺信息',
-        path: '/merchant/detail'
-    }
-]
-
-const adminMenu = [
-    {
-        title: '用户管理',
-        path: '/admin/userlist'
-    },
-    {
-        title: '商家管理',
-        path: '/admin/merchantlist'
-    }
-]
-
-const role = ref(store.state.userInfo?.role);
-
-//activeIndex 用于记录当前激活的菜单项
-const activeIndex = ref('1');
-onMounted(() => {
-    console.log('mounted');
-    setActiveIndex();
-});
-const setActiveIndex = () => {
-    const savedPath = sessionStorage.getItem('activePath');
-    if (savedPath) {
-        switch (savedPath) {
-            case 'consumer/profile':
-                activeIndex.value = '4';
-                break;
-            case 'consumer/orders':
-                activeIndex.value = '3';
-                break;
-            case 'consumer/shop':
-                activeIndex.value = '1';
-                break;
-            default:
-                activeIndex.value = '1';
-        }
-    }
-};
-
-//menu 用于根据角色返回不同的菜单
-const menu = computed(() => {
-    switch (role) {
-        case 'consumer':
-            return consumerMenu;
-        case 'merchant':
-            return merchantMenu;
-        case 'admin':
-            return adminMenu;
-        default:
-            return consumerMenu;
-    }
-})
+    import { ref } from "vue";
+    const isclose = ref(true);
+    const isActive = ref(false);
+    const toggleIsClose = () => {
+        isclose.value = !isclose.value;
+    };
+    const toggleIsActive = () => {
+        isActive.value = !isActive.value;
+    };
 </script>
 
 <template>
-    <el-aside>
-        <el-container class="sidebar-container">
-            <el-row align="top">
-                <el-col :span="24">
-                    <h5 class="mb-2">Welcome {{ store.state.userInfo?.name }}</h5>
-                    <el-menu :default-active="activeIndex" background-color="#22aaee" text-color="#fff" router="true">
-                        <el-menu-item v-for="item in menu" :index="item.path">
-                            <el-icon>
-                                <component :is="item.icon" />
-                            </el-icon>
-                            <span>{{ item.title }}</span>
-                        </el-menu-item>
-                    </el-menu>
-                </el-col>
-            </el-row>
-        </el-container>
-    </el-aside>
+    <div
+        class="sidebar"
+        :class="{ close: isclose }"
+    >
+        <a
+            href="/merchant"
+            class="logo"
+        >
+            <i class="bx bx-code-alt"></i>
+            <div class="logo-name"><span>Asmr</span>Prog</div>
+        </a>
+        <ul class="side-menu">
+            <li>
+                <a href="#"><i class="bx bxs-dashboard"></i>总览</a>
+            </li>
+            <li>
+                <a href="#"><i class="bx bx-store-alt"></i>商品</a>
+            </li>
+            <li
+                :class="{ active: isActive }"
+                @click="toggleIsActive"
+            >
+                <a href="#"><i class="bx bx-analyse"></i>交易</a>
+            </li>
+            <li>
+                <a href="#"><i class="bx bx-message-square-dots"></i>交易</a>
+            </li>
+            <li>
+                <a href="#"><i class="bx bx-group"></i>Users</a>
+            </li>
+            <li>
+                <a href="#"><i class="bx bx-cog"></i>Settings</a>
+            </li>
+        </ul>
+        <ul class="side-menu">
+            <li>
+                <a
+                    href="#"
+                    class="logout"
+                >
+                    <i class="bx bx-log-out-circle"></i>
+                    Logout
+                </a>
+            </li>
+        </ul>
+    </div>
 </template>
 
 <style scoped lang="scss">
-.sidebar-container {
-    height: 100vh;
-    width: 145px;
-    background-color: #445566;
-    position: fixed;
-    overflow-y: auto;
-}
-</style>
+    @import url(https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css);
+    .sidebar {
+        position: sticky;
+        top: 0;
+        left: 0;
+        background: $light;
+        width: 230px;
+        height: 100%;
+        z-index: 2000;
+        overflow-x: hidden;
+        scrollbar-width: none;
+        transition: all 0.3s ease;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+        &.close {
+            width: 60px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            color: $primary;
+            z-index: 500;
+            padding-bottom: 20px;
+            box-sizing: content-box;
+            .logo-name span {
+                color: $dark;
+            }
+        }
 
-<style lang="less">
-.el-menu {
-    padding: 20px 0 0 0px;
-    background-color: #445566;
-
-    border: 0 !important;
-}
-
-.el-menu-item {
-
-    border-radius: 10px;
-    border-right: none;
-    background-color: #445566;
-    outline: none;
-    /* Remove any focus outline */
-    box-shadow: none;
-    /* Remove any box-shadow */
-}
+        .bx {
+            min-width: 60px;
+            display: flex;
+            justify-content: center;
+            font-size: 2.2rem;
+        }
+        .side-menu {
+            width: 100%;
+            margin-top: 48px;
+            li {
+                height: 48px;
+                background: transparent;
+                margin-left: 6px;
+                border-radius: 48px 0 0 48px;
+                padding: 4px;
+                &.active {
+                    background: $grey;
+                    position: relative;
+                    &::before {
+                        content: "";
+                        position: absolute;
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        top: -40px;
+                        right: 0;
+                        box-shadow: 20px 20px 0 $grey;
+                        z-index: -1;
+                    }
+                    &::after {
+                        content: "";
+                        position: absolute;
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        bottom: -40px;
+                        right: 0;
+                        box-shadow: 20px -20px 0 $grey;
+                        z-index: -1;
+                    }
+                    a {
+                        color: $success;
+                    }
+                }
+                a {
+                    width: 100%;
+                    height: 100%;
+                    background: $light;
+                    display: flex;
+                    align-items: center;
+                    border-radius: 48px;
+                    font-size: 16px;
+                    color: $dark;
+                    white-space: nowrap;
+                    overflow-x: hidden;
+                    transition: all 0.3s ease;
+                    .bx {
+                        min-width: calc(60px - ((4px + 6px) * 2));
+                        display: flex;
+                        font-size: 1.6rem;
+                        justify-content: center;
+                    }
+                    &.logout {
+                        color: $danger;
+                    }
+                }
+            }
+        }
+        &.close .side-menu li a {
+            width: calc(48px - (4px * 2));
+            transition: all 0.3s ease;
+        }
+    }
 </style>

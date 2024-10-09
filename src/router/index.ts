@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import routes from "./router";
+import store from "../store";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -12,8 +13,15 @@ const router = createRouter({
 
 // 路由守卫，让没有登录的登录
 router.beforeEach(async (to, _from) => {
+    console.log(to.fullPath);
+
     const isAuthenticated = true;
-    const role = "CONSUMER";
+    if (store.getters.gRole === "") {
+        await store.dispatch("initUserInfoAction");
+    }
+    const role = store.getters.gRole;
+    console.log(role);
+    console.log(to.fullPath);
 
     if (
         // 需要鉴权的页面
@@ -31,6 +39,7 @@ router.beforeEach(async (to, _from) => {
         // 没有权限
         role != to.meta.role
     ) {
+        console.log("没有权限");
         return { name: "404" };
     }
 });

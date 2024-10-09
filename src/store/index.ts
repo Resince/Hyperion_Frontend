@@ -1,13 +1,13 @@
 import { createStore, Store, useStore as useVuexStore } from "vuex";
 import { IRootState, IStoreType } from "@/types/index";
-import loginModule from "./loginRegister/loginStore";
-import registerModule from "./loginRegister/registerStore";
+import loginModule from "./loginStore";
+import registerModule from "./registerStore";
 import { getCache, getToken, setCache } from "@/utils/cache";
 import { updateUserInfoAPI, getUserInfoAPI } from "@/api/userinfoApi";
 import { ElMessage } from "element-plus";
 import router from "@/router";
-import ShoppingListMudule from "./shoppingList/shoppingListStore";
-import goodsStoreMudule from "./goods/goodStore";
+import ShoppingListMudule from "./shoppingListStore";
+import goodsStoreMudule from "./goodStore";
 
 const store = createStore<IRootState>({
     state() {

@@ -1,7 +1,7 @@
 import LoginRegister from "@/views/login/index.vue";
 import ConsumerLayout from "@/layouts/consumerLayout/index.vue";
 import ConsumerHome from "@/views/consumer/home/index.vue";
-
+import MerchantLayout from "@/layouts/managerLayout/index.vue";
 const routes = [
     {
         path: "/test",
@@ -42,6 +42,11 @@ const routes = [
                 component: () => import("@/views/consumer/profile/index.vue"),
             },
             {
+                path: "pay",
+                name: "Pay",
+                component: () => import("@/views/consumer/pay/index.vue"),
+            },
+            {
                 path: "goodsdetails/:id",
                 name: "GoodsDetails",
                 component: () =>
@@ -51,8 +56,8 @@ const routes = [
     },
     {
         path: "/merchant",
-        name: "ManagerLayout",
-        component: () => import("@/layouts/managerLayout/index.vue"),
+        name: "merchantManagerLayout",
+        component: MerchantLayout,
         meta: {
             role: "MERCHANT",
         },
@@ -84,7 +89,7 @@ const routes = [
     },
     {
         path: "/admin",
-        name: "ManagerLayout",
+        name: "adminManagerLayout",
         component: () => import("@/layouts/managerLayout/index.vue"),
         meta: {
             role: "ADMIN",
@@ -104,13 +109,13 @@ const routes = [
         ],
     },
     {
-        path: "/:pathMatch(.*)*",
-        redirect: "/404",
-    },
-    {
         path: "/404",
         name: "404",
         component: () => import("@/views/404/index.vue"),
+    },
+    {
+        path: "/:pathMatch(.*)*",
+        redirect: "/404",
     },
 ];
 

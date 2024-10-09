@@ -99,3 +99,4 @@
 + discount 没有用上
 + 订单 store
 + 购物车 store
++ 个人信息应该加上收货地址

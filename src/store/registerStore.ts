@@ -1,6 +1,6 @@
 import { IRootState } from "@/types/index.ts";
 import { Module } from "vuex";
-import { IRegister, IRegisterRes } from "@/types/loginRegister/register";
+import { IRegister, IRegisterRes } from "@/types/register";
 import { FormInstance } from "element-plus";
 import { ElMessage } from "element-plus";
 import { reqRegister } from "@/api/loginRegisterApi";
