@@ -1,22 +1,16 @@
 <script setup lang="ts">
-    import { PropType } from "vue";
-
-    type dataModelItem = {
-        number: string;
-        icon: string;
-        title: string;
-    };
-    const dataModel = defineModel({
-        required: true,
-        type: Array as PropType<dataModelItem[]>,
-    });
+    import { liColor } from "@/types/enum";
+    defineProps<{
+        data: { number: string; icon: string; title: string; color: liColor }[];
+    }>();
 </script>
 
 <template>
     <ul class="insights">
         <li
-            v-for="(item, index) in dataModel"
+            v-for="(item, index) in data"
             :key="index"
+            :class="item.color"
         >
             <i
                 class="bx"
@@ -56,22 +50,22 @@
                 justify-content: center;
             }
 
-            &:nth-child(1) .bx {
+            &.primary .bx {
                 background: $light-primary;
                 color: $primary;
             }
 
-            &:nth-child(2) .bx {
+            &.warning .bx {
                 background: $light-warning;
                 color: $warning;
             }
 
-            &:nth-child(3) .bx {
+            &.success .bx {
                 background: $light-success;
                 color: $success;
             }
 
-            &:nth-child(4) .bx {
+            &.danger .bx {
                 background: $light-danger;
                 color: $danger;
             }

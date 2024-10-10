@@ -1,13 +1,15 @@
 <script setup lang="ts">
     import DataTable from "@/components/dataTable/index.vue";
+    import Main from "@/components/main/index.vue";
+    import Container from "@/components/container/index.vue";
     const handleFilter = () => {
         console.log("filter");
     };
     const handleSearch = () => {
         console.log("search");
     };
-    const handleClickOrder = (i: any) => {
-        console.log("click order");
+    const handleClickOrder = (i: number) => {
+        console.log("click order", i);
     };
     type dataType = {
         header: { title: string }[];
@@ -72,73 +74,81 @@
 </script>
 
 <template>
-    <DataTable
-        :title="'订单管理'"
-        :titleIcon="'bx-receipt'"
-        :header="data.header"
-        @handleFilter="handleFilter"
-        @handleSearch="handleSearch"
-        @handleClickOrder="handleClickOrder"
-    >
-        <tbody class="order-template">
-            <template
-                v-for="(item, index) in data.orders"
-                :key="index"
+    <Main>
+        <Container>
+            <DataTable
+                :title="'订单管理'"
+                :titleIcon="'bx-receipt'"
+                :header="data.header"
+                :flexBasis="'100%'"
+                @handleFilter="handleFilter"
+                @handleSearch="handleSearch"
+                @handleClickOrder="handleClickOrder"
             >
-                <tr>
-                    <td>
-                        {{ item.order_id }}
-                        {{ item.user_name }}
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td>
-                        <span
-                            class="status"
-                            :class="item.state"
+                <tbody class="order-template">
+                    <template
+                        v-for="(item, index) in data.orders"
+                        :key="index"
+                    >
+                        <tr>
+                            <td>
+                                {{ item.order_id }}
+                                {{ item.user_name }}
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                <span
+                                    class="status"
+                                    :class="item.state"
+                                >
+                                    {{ item.state }}
+                                </span>
+                            </td>
+                            <td>{{ item.create_time }}</td>
+                        </tr>
+                        <tr
+                            v-for="(goods, i) in item.items"
+                            :key="i"
+                            class="goods"
                         >
-                            {{ item.state }}
-                        </span>
-                    </td>
-                    <td>{{ item.create_time }}</td>
-                </tr>
-                <tr
-                    v-for="(goods, i) in item.items"
-                    :key="i"
-                    class="goods"
-                >
-                    <td>
-                        <img :src="goods.cover_url" />
-                        {{ goods.number }}
-                    </td>
-                    <td>{{ goods.single_price }}</td>
-                    <td>{{ goods.number }}</td>
-                    <td></td>
-                    <td>{{ goods.number * goods.single_price }}</td>
-                </tr>
-                <tr>
-                    <td>
-                        {{ item.order_id }}
-                        {{ item.user_name }}
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>
-                        {{
-                            item.items.reduce((accumulator, currentValue) => {
-                                return (
-                                    accumulator +
-                                    currentValue.number *
-                                        currentValue.single_price
-                                );
-                            }, 0)
-                        }}
-                    </td>
-                </tr>
-            </template>
-        </tbody>
-    </DataTable>
+                            <td>
+                                <img :src="goods.cover_url" />
+                                {{ goods.number }}
+                            </td>
+                            <td>{{ goods.single_price }}</td>
+                            <td>{{ goods.number }}</td>
+                            <td></td>
+                            <td>{{ goods.number * goods.single_price }}</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                {{ item.order_id }}
+                                {{ item.user_name }}
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>
+                                {{
+                                    item.items.reduce(
+                                        (accumulator, currentValue) => {
+                                            return (
+                                                accumulator +
+                                                currentValue.number *
+                                                    currentValue.single_price
+                                            );
+                                        },
+                                        0
+                                    )
+                                }}
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </DataTable>
+        </Container>
+    </Main>
 </template>
 
 <style scoped lang="scss">

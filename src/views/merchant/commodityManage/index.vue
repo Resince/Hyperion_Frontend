@@ -1,6 +1,7 @@
 <script setup lang="ts">
-    import { ref } from "vue";
     import DataTable from "@/components/dataTable/index.vue";
+    import Main from "@/components/main/index.vue";
+    import Container from "@/components/container/index.vue";
     const handleFilter = () => {
         console.log("filter");
     };
@@ -38,7 +39,8 @@
         orders: [
             {
                 id: 1,
-                cover_url: "https://via.placeholder.com/150",
+                cover_url:
+                    "https://img14.360buyimg.com/n0/jfs/t1/237508/31/26791/41336/66fab1cdFad9506ae/370786bacd62a6ec.jpg",
                 name: "商品1",
                 date: "2021-10-10",
                 status: "completed",
@@ -50,7 +52,8 @@
             },
             {
                 id: 2,
-                cover_url: "https://via.placeholder.com/150",
+                cover_url:
+                    "https://img14.360buyimg.com/n0/jfs/t1/237508/31/26791/41336/66fab1cdFad9506ae/370786bacd62a6ec.jpg",
                 name: "商品2",
                 date: "2021-10-10",
                 status: "process",
@@ -62,7 +65,8 @@
             },
             {
                 id: 3,
-                cover_url: "https://via.placeholder.com/150",
+                cover_url:
+                    "https://img14.360buyimg.com/n0/jfs/t1/237508/31/26791/41336/66fab1cdFad9506ae/370786bacd62a6ec.jpg",
                 name: "商品3",
                 date: "2021-10-10",
                 status: "pending",
@@ -77,15 +81,20 @@
 </script>
 
 <template>
-    <DataTable
-        :title="'商品管理'"
-        :titleIcon="'bx-receipt'"
-        :header="data.header"
-        :orders="data.orders"
-        @handleFilter="handleFilter"
-        @handleSearch="handleSearch"
-        @handleClickOrder="handleClickOrder"
-    ></DataTable>
+    <Main>
+        <Container>
+            <DataTable
+                :title="'商品管理'"
+                :titleIcon="'bx-receipt'"
+                :header="data.header"
+                :orders="data.orders"
+                :flexBasis="'100%'"
+                @handleFilter="handleFilter"
+                @handleSearch="handleSearch"
+                @handleClickOrder="handleClickOrder"
+            ></DataTable>
+        </Container>
+    </Main>
 </template>
 
 <style scoped lang="scss"></style>

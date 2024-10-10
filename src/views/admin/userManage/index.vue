@@ -1,17 +1,12 @@
 <script setup lang="ts">
-    import { ref } from "vue";
+    import Main from "@/components/main/index.vue";
+    import Container from "@/components/container/index.vue";
     import DataTable from "@/components/dataTable/index.vue";
-    const handleFilter = () => {
-        console.log("filter");
-    };
-    const handleSearch = () => {
-        console.log("search");
-    };
-    const handleClickOrder = (i: any) => {
-        console.log("click order");
-    };
+    import Header from "@/components/header/index.vue";
+    import Reminder from "@/components/reminder/index.vue";
+
     type dataType = {
-        header: { title: string }[];
+        orderHeader: { title: string }[];
         orders: {
             id: number;
             cover_url: string;
@@ -24,9 +19,13 @@
             stock: number;
             total_sales: number;
         }[];
+        backlog?: {
+            title: string;
+            status: boolean;
+        }[];
     };
     const data: dataType = {
-        header: [
+        orderHeader: [
             { title: "商品信息" },
             { title: "商品描述" },
             { title: "商品价格" },
@@ -73,19 +72,61 @@
                 total_sales: 100,
             },
         ],
+        backlog: [
+            { title: "任务1", status: false },
+            { title: "任务2", status: true },
+            { title: "任务3", status: false },
+        ],
+    };
+    const handleTableFilter = () => {
+        console.log("filter");
+    };
+    const handleTableSearch = () => {
+        console.log("search");
+    };
+    const handleClickOrder = (i: number) => {
+        console.log("click order", i);
+    };
+    const handleReminderFilter = () => {
+        console.log("filter");
+    };
+    const handleReminderPlus = () => {
+        console.log("plus");
+    };
+    const handleMoreOptions = (i: number) => {
+        console.log("more options", i);
+    };
+    const handleToggleStatus = (i: number) => {
+        console.log("toggle status", i);
     };
 </script>
 
 <template>
-    <DataTable
-        :title="'用户管理'"
-        :titleIcon="'bx-receipt'"
-        :header="data.header"
-        :orders="data.orders"
-        @handleFilter="handleFilter"
-        @handleSearch="handleSearch"
-        @handleClickOrder="handleClickOrder"
-    ></DataTable>
+    <Main>
+        <Header :headerTitle="'用户管理'" />
+        <Container>
+            <DataTable
+                :title="'用户管理'"
+                :titleIcon="'bx-receipt'"
+                :header="data.orderHeader"
+                :orders="data.orders"
+                :flexBasis="'500px'"
+                @handleFilter="handleTableFilter"
+                @handleSearch="handleTableSearch"
+                @handleClickOrder="handleClickOrder"
+            />
+            <Reminder
+                :title="'用户详情'"
+                :titleIcon="'bx-note'"
+                :backlog="data.backlog"
+                :flexBasis="'300px'"
+                @handleFilter="handleReminderFilter"
+                @handlePlus="handleReminderPlus"
+                @handleMoreOptions="handleMoreOptions"
+                @toggleStatus="handleToggleStatus"
+            />
+        </Container>
+    </Main>
 </template>
 
 <style scoped lang="scss"></style>

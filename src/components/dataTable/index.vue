@@ -3,6 +3,7 @@
         title: string;
         titleIcon: string;
         header: { title: string }[];
+        flexBasis?: string;
         orders?: {
             id: number;
             cover_url: string;
@@ -16,6 +17,11 @@
             total_sales: number;
         }[];
     }>();
+    /**
+     * @emits handleFilter 返回筛选事件
+     * @emits handleSearch 返回搜索事件
+     * @emits handleClickOrder 返回点击订单事件, 参数为订单id
+     */
     const emit = defineEmits<{
         (e: "handleFilter"): void;
         (e: "handleSearch"): void;
@@ -24,7 +30,11 @@
 </script>
 
 <template>
-    <div class="orders">
+    <div
+        class="orders"
+        :class="{ ordersFlex: !!props.flexBasis }"
+        :style="{ flexBasis: props.flexBasis }"
+    >
         <div class="header">
             <i
                 class="bx"
@@ -84,14 +94,14 @@
 
 <style scoped lang="scss">
     .orders {
+        &.ordersFlex {
+            flex-grow: 1;
+        }
         color: $dark;
         border-radius: 20px;
         background: $light;
         padding: 24px;
-        margin: 24px;
         overflow-x: auto;
-        width: calc(100% - 60px);
-
         .header {
             display: flex;
             align-items: center;
@@ -104,7 +114,7 @@
                 font-weight: 600;
             }
 
-            bx {
+            .bx {
                 cursor: pointer;
             }
         }

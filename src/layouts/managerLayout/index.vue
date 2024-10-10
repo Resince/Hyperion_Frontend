@@ -15,7 +15,7 @@
         { name: "交易", icon: "bxs-analyse", link: "/merchant/orderManage" },
     ];
     const sliderListAdmin = [
-        { name: "用户管理", icon: "bxs-user", link: "/admin/userManage" },
+        { name: "用户管理", icon: "bxs-user", link: "/admin/usermanage" },
     ];
     const sliderList = path.includes("merchant")
         ? sliderListMerchant
