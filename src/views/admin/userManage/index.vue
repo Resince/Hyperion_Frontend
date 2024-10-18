@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import Main from "@/components/main/index.vue";
     import Container from "@/components/container/index.vue";
-    import DataTable from "@/components/dataTable/index.vue";
+    import DataTable from "@/components/dataTable/table2.vue";
     import Header from "@/components/header/index.vue";
     import Reminder from "@/components/reminder/index.vue";
 

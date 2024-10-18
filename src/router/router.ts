@@ -2,6 +2,8 @@ import LoginRegister from "@/views/login/index.vue";
 import ConsumerLayout from "@/layouts/consumerLayout/index.vue";
 import ConsumerHome from "@/views/consumer/home/index.vue";
 import MerchantLayout from "@/layouts/managerLayout/index.vue";
+import path from "path";
+import { pa } from "element-plus/es/locales.mjs";
 const routes = [
     {
         path: "/test",
@@ -51,6 +53,14 @@ const routes = [
                 name: "GoodsDetails",
                 component: () =>
                     import("@/views/consumer/goodsDetails/index.vue"),
+                props: true,
+            },
+            {
+                path: "orderdetails/:id",
+                name: "ConsumerOrderDetails",
+                component: () =>
+                    import("@/views/consumer/orderDetails/index.vue"),
+                params: true,
             },
         ],
     },
@@ -81,7 +91,7 @@ const routes = [
             },
             {
                 path: "orderdetails",
-                name: "OrderDetails",
+                name: "MerchantOrderDetails",
                 component: () =>
                     import("@/views/merchant/orderDetails/index.vue"),
             },

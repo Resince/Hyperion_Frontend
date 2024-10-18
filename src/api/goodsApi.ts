@@ -44,6 +44,7 @@ export const reqGoodsList = (
     pageNum: number
 ): Promise<IDataType<IGoodsListItem[]>> => {
     const params = {
+        
         pageNum: pageNum,
         pageSize: pageSize,
     };

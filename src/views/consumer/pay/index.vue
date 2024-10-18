@@ -1,11 +1,20 @@
 <script setup lang="ts">
     import { Edit } from "@element-plus/icons-vue";
-    import { ref } from "vue";
+    import { onMounted, ref } from "vue";
+    import { useStore } from "@/store/index.ts";
     const radio2 = ref("1");
+    const store = useStore();
+    const tableData = ref([]);
+    const initeData = () => {
+        tableData.value = store.getters["ShoppingListMudule/orderList"];
+    };
+    onMounted(() => {
+        initeData();
+    });
 </script>
 
 <template>
-    <div class="pay">
+    <div class="Cus-orderDetail">
         <div class="pay-title">结算页</div>
         <div class="pay-msg">
             <div class="pay-msg-title">
@@ -41,6 +50,46 @@
                 <el-descriptions-item label="地址"> {{}} </el-descriptions-item>
             </el-descriptions>
         </div>
+        <div>
+            <el-table
+                :data="tableData"
+                style="width: 100%"
+            >
+                <el-table-column
+                    prop="cover_url"
+                    label="已购商品"
+                    width="180"
+                >
+                    <template v-slot="{ row }">
+                        <img
+                            :src="row.cover_url"
+                            alt=""
+                            style="width: 60px; height: 60px"
+                        />
+                    </template>
+                </el-table-column>
+                <el-table-column
+                    prop="name"
+                    label="商品名称"
+                    width="400"
+                ></el-table-column>
+                <el-table-column
+                    prop="price"
+                    label="单价"
+                    width="200"
+                ></el-table-column>
+                <el-table-column
+                    prop="quantity"
+                    label="数量"
+                    width="200"
+                ></el-table-column>
+                <el-table-column
+                    prop="allPrice"
+                    label="小计"
+                    width="180"
+                ></el-table-column>
+            </el-table>
+        </div>
         <div class="pay-method">
             <h1>支付方式</h1>
             <el-radio-group v-model="radio2">
@@ -56,7 +105,7 @@
 </template>
 
 <style scoped lang="scss">
-    .pay {
+    .Cus-orderDetail {
         display: flex;
         flex-direction: column;
         gap: 20px;

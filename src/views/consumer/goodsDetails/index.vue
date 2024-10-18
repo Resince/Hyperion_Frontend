@@ -54,12 +54,9 @@
                     </div>
                 </div>
                 <div class="buttons">
-                    <button
-                        class="addtoShoppingList"
-                        @click="handleAddToShoppingList"
-                    >
-                        加入购物车
-                    </button>
+                    <div class="buttons-number">
+                        <div>{{ quantity }}</div>
+                    </div>
                     <div class="quantity">
                         <button
                             class="plus"
@@ -74,13 +71,19 @@
                             -
                         </button>
                     </div>
+                    <button
+                        class="addtoShoppingList"
+                        @click="handleAddToShoppingList"
+                    >
+                        加入购物车
+                    </button>
                 </div>
             </div>
         </div>
-        <div class="details-message">
+        <!-- <div class="details-message">
             <div class="comment">商品评论</div>
             <div class="introduction">商品介绍</div>
-        </div>
+        </div> -->
     </div>
 </template>
 
@@ -151,6 +154,19 @@
                         border: 2px solid black;
                         border-radius: 5px;
                         cursor: pointer;
+                    }
+                    .buttons-number {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        width: 40px;
+                        height: 40px;
+                        font-size: 17px;
+                        background-color: yellow;
+                        color: black;
+                        border: 2px solid black;
+                        border-radius: 5px;
                     }
                     .quantity {
                         display: flex;

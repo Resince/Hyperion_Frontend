@@ -30,7 +30,7 @@ router.beforeEach(async (to, _from) => {
         // 但是没有登录
         !isAuthenticated &&
         // 避免无限重定向
-        to.path != "/login"
+        to.path !== "/login"
     ) {
         return { name: "LoginRegister" };
     } else if (
@@ -38,7 +38,7 @@ router.beforeEach(async (to, _from) => {
         // 需要鉴权
         to.meta.role &&
         // 没有权限
-        role != to.meta.role
+        role !== to.meta.role
     ) {
         console.log("没有权限");
         return { name: "404" };

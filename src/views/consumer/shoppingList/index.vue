@@ -4,14 +4,18 @@
     import Tablerow from "./components/tablerow.vue";
     import { onMounted, ref } from "vue";
     import { useStore } from "@/store";
+    import { useRouter } from "vue-router";
+    import { watch } from "vue";
     const store = useStore();
+    const selectAll = ref<boolean>(false);
+    const router = useRouter();
     const data = ref<IShoppingListItem[]>([]);
-    const selectall = ref<boolean>(false);
-    const handlePay = () => {
-        console.log("pay");
-    };
+    const shoppingListLength = ref<number>(0);
+    const selectedGoods = ref<Set<number>>(new Set());
     const initeData = async () => {
-        // data.value = await store.dispatch("ShoppingListMudule/getShoppingList");
+        await store.dispatch("ShoppingListMudule/getShoppingList");
+        data.value = store.getters["ShoppingListMudule/shoppingList"];
+        shoppingListLength.value = data.value.length;
     };
     onMounted(() => {
         initeData();
@@ -19,14 +23,73 @@
     const handleSort = (i: string) => {
         console.log("sort by", i);
     };
+    const handleSelectAll = () => {
+        if (selectAll.value) {
+            data.value.map((item) => {
+                selectedGoods.value.add(item.id);
+            });
+        } else {
+            selectedGoods.value.clear();
+        }
+    };
+    watch(
+        () => selectedGoods.value.size,
+        (newVal: number) => {
+            if (newVal === data.value.length) {
+                selectAll.value = true;
+            } else {
+                selectAll.value = false;
+            }
+        }
+    );
+    const handleFilter = () => {
+        console.log("filter");
+    };
+    const calculatePrice = () => {
+        let price = 0;
+        selectedGoods.value.forEach((item) => {
+            const foundItem = data.value.find((i) => i.id === item);
+            if (foundItem) {
+                price += foundItem.price;
+            }
+        });
+        return price;
+    };
+    const cauculateDiscount = () => {
+        let discount = 0;
+        selectedGoods.value.forEach((item) => {
+            const foundItem = data.value.find((i) => i.id === item);
+            if (!foundItem) return;
+            discount += foundItem.discount * foundItem.price;
+        });
+        return discount;
+    };
+    function handleClickGood(id: number) {
+        router.push({ name: "GoodsDetails", params: { id: id } });
+    }
+    function handleClickDelete(id: number) {
+        data.value = data.value.filter((item) => item.id !== id);
+    }
+    const handlePay = () => {
+        store.commit(
+            "ShoppingListMudule/changeOrderList",
+            selectedGoods.value
+        );
+        router.push({ name: "Pay" });
+    };
 </script>
 
 <template>
     <div class="shoppingList">
         <div class="shoppingList-header">
-            <h1 class="shoppingList-header-title">我的购物车(10)</h1>
+            <h1 class="shoppingList-header-title">
+                我的购物车({{ shoppingListLength }})
+            </h1>
             <div class="shoppingList-header-action">
-                <button class="shoppingList-header-action-button">
+                <button
+                    class="shoppingList-header-action-button"
+                    @click="handleFilter"
+                >
                     <span>Filter</span
                     ><svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -51,8 +114,9 @@
             <div class="tableview-header">
                 <div class="product-cell selectall">
                     <el-checkbox
-                        v-model="selectall"
+                        v-model="selectAll"
                         size="large"
+                        @change="handleSelectAll"
                     />
                     <div>全选</div>
                 </div>
@@ -72,20 +136,28 @@
                 </div>
                 <div class="product-cell action">操作</div>
             </div>
-            <Tablerow v-for="_ in 10" />
+            <Tablerow
+                v-for="item in data"
+                :row="item"
+                :selected-goods="selectedGoods"
+                @handle-click-delete="handleClickDelete"
+                @handle-click-good="handleClickGood"
+            />
         </div>
         <div class="shoppingList-footer">
             <button class="selected-delete">删除选中</button>
             <div class="selected-msg">
                 <div class="selected-quantity">
-                    已选择<span>{{}}</span>件商品
+                    已选择
+                    <span>{{ selectedGoods.size }}</span>
+                    件商品
                 </div>
                 <div class="selected-price">
                     <div class="selected-price-all">
-                        总价：<span>{{}}</span>
+                        <span>总价:{{ calculatePrice() }}</span>
                     </div>
                     <div class="selected-price-discount">
-                        促销：<span>{{}}</span>
+                        促销:<span>{{ cauculateDiscount() }}</span>
                     </div>
                 </div>
                 <button
@@ -112,7 +184,7 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            padding:5px 5px;
+            padding: 5px 5px;
             background-color: $cus_background;
             &-title {
                 font-size: 22px;

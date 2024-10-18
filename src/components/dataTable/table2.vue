@@ -2,8 +2,7 @@
     const props = defineProps<{
         title: string;
         titleIcon: string;
-        header: { title: string }[];
-        flexBasis?: string;
+        header: { title: string; width: string; label: string }[]; // width: 如果传入的是百分比：30% 如果传入的是固定值：200px
         orders?: {
             id: number;
             cover_url: string;
@@ -12,7 +11,6 @@
             status: string;
             statusMeg: string;
             price: number;
-            discount: number;
             stock: number;
             total_sales: number;
         }[];
@@ -30,11 +28,7 @@
 </script>
 
 <template>
-    <div
-        class="orders"
-        :class="{ ordersFlex: !!props.flexBasis }"
-        :style="{ flexBasis: props.flexBasis }"
-    >
+    <div class="orders">
         <div class="header">
             <i
                 class="bx"
@@ -56,43 +50,18 @@
                     <th
                         v-for="(item, index) in props.header"
                         :key="index"
+                        :style="{ width: item.width }"
                     >
                         {{ item.title }}
                     </th>
                 </tr>
             </thead>
-            <slot>
-                <tbody>
-                    <tr
-                        v-for="(item, index) in props.orders"
-                        :key="index"
-                        @click="emit('handleClickOrder', item.id)"
-                    >
-                        <td>
-                            <img :src="item.cover_url" />
-                            <p>{{ item.name }}</p>
-                        </td>
-                        <td>{{ item.date }}</td>
-                        <td>
-                            <span
-                                class="status"
-                                :class="item.status"
-                            >
-                                {{ item.statusMeg }}
-                            </span>
-                        </td>
-                        <td>{{ item.price }}</td>
-                        <td>{{ item.discount }}</td>
-                        <td>{{ item.stock }}</td>
-                        <td>{{ item.total_sales }}</td>
-                    </tr>
-                </tbody>
-            </slot>
+            <slot> </slot>
         </table>
     </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
     .orders {
         &.ordersFlex {
             flex-grow: 1;
@@ -121,9 +90,11 @@
 
         table {
             width: 100%;
+            overflow-y: auto;
             border-collapse: collapse;
 
             th {
+                min-width: 100px;
                 padding-bottom: 12px;
                 font-size: 13px;
                 text-align: left;
@@ -131,7 +102,12 @@
             }
 
             td {
+                width: 200px;
                 padding: 16px 0;
+            }
+
+            tr {
+                display: table;
             }
 
             tr td:first-child {

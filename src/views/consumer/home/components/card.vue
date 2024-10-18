@@ -15,7 +15,7 @@
     const handlePurchase = () => {
         // TODO : Purchase
         // 跳转指详情页面
-        router.push(`/consumer/goodsdetails/:${data.id}`);
+        router.push({ name: "ConsumerGoodsDetails", params: { id: data.id } });
     };
 </script>
 

@@ -4,9 +4,11 @@ import loginModule from "./loginStore";
 import registerModule from "./registerStore";
 import { getCache, getToken, setCache } from "@/utils/cache";
 import { updateUserInfoAPI, getUserInfoAPI } from "@/api/userinfoApi";
-import { ElMessage } from "element-plus";
-import ShoppingListMudule from "./shoppingListStore";
+import ShoppingListModule from "./shoppingListStore";
 import goodsStoreMudule from "./goodStore";
+import tableStoreMudule from "./componentStore/tableStore";
+import addressStoreMudule from "./addressStore";
+import orderStoreMudule from "./orderStore";
 
 const store = createStore<IRootState>({
     state() {
@@ -46,7 +48,7 @@ const store = createStore<IRootState>({
             if (!token || !id || !role) {
                 return;
             }
-            const res = await getUserInfoAPI(id);
+            const res = await getUserInfoAPI();
             if (res.code !== 0 || !res.data) {
                 return;
             }
@@ -73,12 +75,21 @@ const store = createStore<IRootState>({
         gId(state) {
             return state.id;
         },
+        gName(state) {
+            return state.name;
+        },
+        gTel(state) {
+            return state.tel;
+        },
     },
     modules: {
         loginModule,
         registerModule,
-        ShoppingListMudule,
+        ShoppingListMudule: ShoppingListModule,
         goodsStoreMudule,
+        tableStoreMudule,
+        addressStoreMudule,
+        orderStoreMudule,
     },
 });
 

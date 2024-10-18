@@ -1,39 +1,75 @@
 import request from "@/utils/request";
-import { IOrder } from "@/types/order";
 import { IDataType } from "@/types";
-import qs from "qs";
-
-export const getOrderAPI = (
-    id: string,
-    role: string,
-    name?: string
-): Promise<IDataType<IOrder>> => {
-    const params = qs.stringify({
-        role,
-        name,
-    });
-    return request({
-        url: `/order/list/${id}?${params}`,
-        method: "get",
+import { IMerchantOrder, IOrder } from "@/types/order";
+export const getOrderList = (
+    pageSize: number,
+    pageNum: number,
+    state: string
+) => {
+    return request.get<IDataType<IOrder>>(`/order/consumer/list`, {
+        params: {
+            pageSize,
+            pageNum,
+            state,
+        },
     });
 };
 
-export const updateOrderAPI = (data: IOrder): Promise<IDataType<>> => {
-    return request({
-        url: "/order/update/" + data.id,
-        method: "post",
-        data: {
-            address: data.address,
-            complete_time: data.complete_time,
-            con_id: data.con_id,
-            consignee: data.consignee,
-            contact: data.contact,
-            cover_url: data.cover_url,
-            create_time: data.create_time,
-            id: data.id,
-            mer_id: data.mer_id,
-            payment: data.payment,
-            state: data.state,
+export const getOrderDetail = (id: number) => {
+    return request.get<IDataType<IOrder>>(`/order/consumer/detail`, {
+        params: {
+            id,
         },
+    });
+};
+
+export const getOrderListByMerchant = (
+    pageSize: number,
+    pageNum: number,
+    state: string
+) => {
+    return request.get<IDataType<IMerchantOrder>>(`/order/consumer/list`, {
+        params: {
+            pageSize,
+            pageNum,
+            state,
+        },
+    });
+};
+
+export const createOrder = (addrId: number, goodsIdList: number[]) => {
+    return request.post<IDataType>("/order/add", {
+        addrId,
+        goodsIdList,
+    });
+};
+
+export const orderPay = (orderId: number) => {
+    return request.patch<IDataType>("/order/pay", {
+        orderId,
+    });
+};
+
+export const orderReceive = (orderId: number) => {
+    return request.patch<IDataType>("/order/receive", {
+        orderId,
+    });
+};
+
+export const orderSent = (orderId: number) => {
+    return request.patch<IDataType>("/order/ship", {
+        orderId,
+    });
+};
+
+export const orderReview = (
+    orderId: number,
+    goodsId: number,
+    review: string
+) => {
+    return request.patch<IDataType>("/order/review", {
+        orderId,
+        goodsId,
+        review,
     });
 };

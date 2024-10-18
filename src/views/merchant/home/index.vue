@@ -1,62 +1,65 @@
 <script setup lang="ts">
-    import { ref } from "vue";
+    import { onMounted, ref } from "vue";
     import Inslights from "@/components/insights/index.vue";
     import Header from "@/components/header/index.vue";
     import Main from "@/components/main/index.vue";
     import Container from "@/components/container/index.vue";
-    import DataTable from "@/components/dataTable/index.vue";
+    import DataTable from "@/components/dataTable/table.vue";
     import Reminder from "@/components/reminder/index.vue";
+    import DataTableColumn from "@/components/dataTable/tableColumn.vue";
     import { liColor } from "@/types/enum";
+    import Status from "@/components/dataTable/status.vue";
+    import { IGoodsListItem } from "@/types/goods";
 
-    const data = ref({
-        orderHeader: [
-            { title: "商品信息" },
-            { title: "商品描述" },
-            { title: "商品价格" },
-            { title: "商品折扣" },
-            { title: "库存数量" },
-            { title: "状态" },
-            { title: "总销量" },
-        ],
+    const data = ref<{
+        orders: IGoodsListItem[];
+        backlog: {
+            title: string;
+            status: boolean;
+        }[];
+        insights: {
+            number: string;
+            icon: string;
+            title: string;
+            color: liColor;
+        }[];
+    }>({
         orders: [
             {
                 id: 1,
                 cover_url:
                     "https://img14.360buyimg.com/n0/jfs/t1/237508/31/26791/41336/66fab1cdFad9506ae/370786bacd62a6ec.jpg",
                 name: "商品1",
-                date: "2021-10-10",
-                status: "completed",
-                statusMeg: "已完成",
-                price: 100,
+                state: "completed",
+                quantity: 100,
+                tot_sales: 100,
+                desc: "商品1描述",
                 discount: 0.8,
-                stock: 100,
-                total_sales: 100,
+                price: 100,
             },
             {
                 id: 2,
                 cover_url:
                     "https://img14.360buyimg.com/n0/jfs/t1/237508/31/26791/41336/66fab1cdFad9506ae/370786bacd62a6ec.jpg",
                 name: "商品2",
-                date: "2021-10-10",
-                status: "process",
-                statusMeg: "进行中",
-                price: 100,
+                state: "completed",
+                quantity: 100,
+                tot_sales: 100,
+                desc: "商品1描述",
                 discount: 0.8,
-                stock: 100,
-                total_sales: 100,
+                price: 100,
             },
             {
                 id: 3,
                 cover_url:
                     "https://img14.360buyimg.com/n0/jfs/t1/237508/31/26791/41336/66fab1cdFad9506ae/370786bacd62a6ec.jpg",
                 name: "商品3",
-                date: "2021-10-10",
-                status: "pending",
-                statusMeg: "待处理",
-                price: 100,
+                state: "completed",
+                quantity: 100,
+                tot_sales: 100,
+                desc: "商品1描述",
                 discount: 0.8,
-                stock: 100,
-                total_sales: 100,
+                price: 100,
             },
         ],
         backlog: [
@@ -100,6 +103,12 @@
             },
         ],
     });
+    const init = () => {
+        
+    };
+    onMounted(() => {
+        init();
+    });
     const handleTableFilter = () => {
         console.log("filter");
     };
@@ -125,24 +134,73 @@
 
 <template>
     <Main>
-        <Header :headerTitle="'总览'" />
+        <Header headerTitle="总览" />
         <Inslights :data="data.insights" />
         <Container>
             <DataTable
-                :title="'用户管理'"
+                :title="'商品管理'"
                 :titleIcon="'bx-receipt'"
-                :header="data.orderHeader"
                 :orders="data.orders"
                 :flexBasis="'500px'"
+                :tbodyMaxHeight="'500px'"
                 @handleFilter="handleTableFilter"
                 @handleSearch="handleTableSearch"
                 @handleClickOrder="handleClickOrder"
-            />
+            >
+                <DataTableColumn
+                    title="商品信息"
+                    label="name"
+                    width="100px"
+                >
+                    <template #default="{ row }">
+                        <div
+                            style="
+                                display: flex;
+                                align-items: center;
+                                gap: 12px;
+                                padding-left: 6px;
+                            "
+                        >
+                            <img
+                                :src="row.cover_url"
+                                alt=""
+                                style="
+                                    width: 36px;
+                                    height: 36px;
+                                    border-radius: 20%;
+                                    object-fit: cover;
+                                "
+                            />
+                            <span>{{ row.name }}</span>
+                        </div>
+                    </template>
+                </DataTableColumn>
+                <DataTableColumn
+                    title="库存数量"
+                    width="100px"
+                    label="quantity"
+                ></DataTableColumn>
+                <DataTableColumn
+                    title="状态"
+                    width="100px"
+                    label="state"
+                >
+                    <template #default="{ row }">
+                        <Status :row="row"></Status>
+                    </template>
+                </DataTableColumn>
+                <DataTableColumn
+                    title="总销量"
+                    width="100px"
+                    label="tot_sales"
+                ></DataTableColumn>
+            </DataTable>
             <Reminder
-                :title="'用户详情'"
+                :title="'待办事项'"
                 :titleIcon="'bx-note'"
                 :backlog="data.backlog"
                 :flexBasis="'300px'"
+                :tbodyMaxHeight="'400px'"
                 @handleFilter="handleReminderFilter"
                 @handlePlus="handleReminderPlus"
                 @handleMoreOptions="handleMoreOptions"
@@ -152,6 +210,4 @@
     </Main>
 </template>
 
-<style lang="scss">
-    
-</style>
+<style lang="scss"></style>

@@ -12,6 +12,7 @@
         flex-wrap: wrap;
         gap: 24px;
         margin-top: 24px;
+        margin-bottom: 24px;
         width: 100%;
         color: $dark;
     }

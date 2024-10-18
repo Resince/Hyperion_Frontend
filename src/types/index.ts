@@ -3,6 +3,9 @@ import { ILogin } from "./login";
 import { IRegister } from "./register";
 import { IGoods } from "./goods";
 import { IShoppingListType } from "./shoppingList";
+import { ITableStore } from "./table";
+import { IAddressState } from "./address";
+import { IOrder } from "./order";
 // 基础信息的类型定义
 
 /**
@@ -38,6 +41,9 @@ export interface IRootWithModule {
     regesterModule: IRegister;
     goodsStroeMudule: IGoods;
     shoppingListMudule: IShoppingListType;
+    tableStoreMudule: ITableStore;
+    addressStoreMudule: IAddressState;
+    orderStoreMudule: IOrder;
 }
 
 export type IStoreType = IRootState & IRootWithModule;

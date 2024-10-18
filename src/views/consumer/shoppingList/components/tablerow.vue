@@ -2,7 +2,43 @@
     import { ref } from "vue";
     import { ElButton, ElCheckbox } from "element-plus";
     import { Delete } from "@element-plus/icons-vue";
+    import { IShoppingListItem } from "@/types/shoppingList";
+    import { watch } from "vue";
     const selected = ref(false);
+    const selectedGoods = defineModel("selectedGoods", {
+        type: Set<number>,
+        default: new Set(),
+    });
+    const props = defineProps<{
+        row: IShoppingListItem;
+    }>();
+    const emit = defineEmits<{
+        (e: "handleClickGood", id: number): void;
+        (e: "handleClickDelete", id: number): void;
+    }>();
+    const handleSelected = () => {
+        if (selected.value) {
+            selectedGoods.value.add(props.row.id);
+        } else {
+            for (let item of selectedGoods.value) {
+                if (item === props.row.id) {
+                    selectedGoods.value.delete(item);
+                }
+            }
+        }
+    };
+    watch(
+        () => {
+            return selectedGoods.value.has(props.row.id);
+        },
+        () => {
+            if (selectedGoods.value.has(props.row.id)) {
+                selected.value = true;
+            } else {
+                selected.value = false;
+            }
+        }
+    );
 </script>
 
 <template>
@@ -11,23 +47,28 @@
             v-model="selected"
             size="large"
             class="selectall"
+            @change="handleSelected"
         />
-        <div class="product-cell image">
+        <div
+            class="product-cell image"
+            @click="emit('handleClickGood', props.row.id)"
+        >
             <img
-                src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
+                :src="props.row.cover_url"
                 alt=""
             />
             <span>Ocean</span>
         </div>
-        <div class="product-cell describe">Furniture</div>
-        <div class="product-cell singlePrice">11</div>
-        <div class="product-cell quantity">36</div>
-        <div class="product-cell price">$560</div>
+        <div class="product-cell describe">{{ props.row.name }}</div>
+        <div class="product-cell singlePrice">{{ props.row.price }}</div>
+        <div class="product-cell quantity">{{ props.row.quantity }}</div>
+        <div class="product-cell price">￥{{ props.row.price }}</div>
         <div class="product-cell action">
             <el-button
                 type="danger"
                 :icon="Delete"
                 circle
+                @click="emit('handleClickDelete', props.row.id)"
             />
         </div>
     </div>

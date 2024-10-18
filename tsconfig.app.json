@@ -24,7 +24,8 @@
             "@/*": ["src/*"],
             "vuex": ["./node_modules/vuex/types"]
         },
-        "allowSyntheticDefaultImports": true
+        "allowSyntheticDefaultImports": true,
+        "jsxImportSource": "vue"
     },
     "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
 }

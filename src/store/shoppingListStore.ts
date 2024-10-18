@@ -12,11 +12,12 @@ import {
 } from "@/types/shoppingList";
 import { Module } from "vuex";
 
-const ShoppingListMudule: Module<IShoppingListType, IRootState> = {
+const ShoppingListModule: Module<IShoppingListType, IRootState> = {
     namespaced: true,
     state() {
         return {
             shoppingList: [],
+            orderList: new Set<number>(),
         };
     },
     mutations: {
@@ -35,6 +36,9 @@ const ShoppingListMudule: Module<IShoppingListType, IRootState> = {
                 }
                 return item;
             });
+        },
+        changeOrderList(state, list: Set<number>) {
+            state.orderList = list;
         },
     },
     actions: {
@@ -79,5 +83,34 @@ const ShoppingListMudule: Module<IShoppingListType, IRootState> = {
             commit("changeShoppingList", res.data);
         },
     },
+    getters: {
+        shoppingList(state) {
+            return state.shoppingList;
+        },
+        orderList(state) {
+            let orderList = [] as {
+                cover_url: string;
+                id: number;
+                name: string;
+                price: number;
+                quantity: number;
+                allPrice: number;
+            }[];
+            state.orderList.forEach((item) => {
+                const i = state.shoppingList.find((i) => i.id === item);
+                if (i) {
+                    orderList.push({
+                        id: i.id,
+                        quantity: i.quantity,
+                        price: i.price,
+                        name: i.name,
+                        cover_url: i.cover_url,
+                        allPrice: i.price * i.quantity,
+                    });
+                }
+            });
+            return orderList;
+        },
+    },
 };
-export default ShoppingListMudule;
+export default ShoppingListModule;

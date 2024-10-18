@@ -4,3 +4,9 @@ export enum liColor {
     SUCCESS = "success",
     DANGWR = "danger",
 }
+
+export enum liStatus {
+    PENDING = "pending",
+    SUCCESS = "success",
+    FAILED = "failed",
+}

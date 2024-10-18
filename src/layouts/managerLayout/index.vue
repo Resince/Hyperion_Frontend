@@ -54,6 +54,17 @@
         height: 100vh;
         width: 100vw;
         flex-direction: row;
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+        &::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
     }
     .content {
         position: relative;

@@ -1,5 +1,6 @@
 export interface IShoppingListType {
     shoppingList: IShoppingListItem[];
+    orderList: Set<number>;
 }
 
 /**
@@ -24,6 +25,7 @@ export interface IShoppingList {
  * @param {string} name - name of the shoppingListItem
  * @param {number} price - price of the shoppingListItem
  * @param {number} quantity - quantity of the shoppingListItem
+ * @param {string} state - 商品状态，如果为DELETED则不显示,无法下单
  */
 export interface IShoppingListItem {
     cover_url: string;
@@ -32,4 +34,5 @@ export interface IShoppingListItem {
     name: string;
     price: number;
     quantity: number;
+    state: string;
 }

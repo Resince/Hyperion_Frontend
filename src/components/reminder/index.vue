@@ -1,4 +1,6 @@
 <script setup lang="ts">
+    import { computed, CSSProperties } from "vue";
+
     const props = defineProps<{
         title: string;
         titleIcon: string;
@@ -7,6 +9,7 @@
             status: boolean;
         }[];
         flexBasis?: string;
+        tbodyMaxHeight?: string;
     }>();
     /**
      * @emits handleFilter 返回筛选事件
@@ -20,6 +23,15 @@
         (e: "handleMoreOptions", i: number): void;
         (e: "toggleStatus", i: number): void;
     }>();
+    const styleScroll = computed<CSSProperties | undefined>(() => {
+        return props.tbodyMaxHeight
+            ? {
+                  display: "block",
+                  maxHeight: props.tbodyMaxHeight,
+                  overflowY: "auto",
+              }
+            : {};
+    });
 </script>
 
 <template>
@@ -43,7 +55,10 @@
                 @click="emit('handlePlus')"
             ></i>
         </div>
-        <ul class="task-list">
+        <ul
+            class="task-list"
+            :style="styleScroll"
+        >
             <li
                 :class="item.status ? 'completed' : 'not-completed'"
                 v-for="(item, index) in props.backlog"

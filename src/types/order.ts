@@ -1,27 +1,60 @@
-/**
- * @interface IOrder
- * @param {string} address - address of the order
- * @param {Date} complete_time - complete time of the order
- * @param {number} con_id - id of the consignee
- * @param {string} consignee - consignee of the order
- * @param {string} contact - contact of the order
- * @param {string} cover_url - cover url of the order
- * @param {Date} create_time - create time of the order
- * @param {number} id - id of the order
- * @param {number} mer_id - id of the merchant
- * @param {number} payment - payment of the order
- * @param {string} state - state of the order
- */
 export interface IOrder {
-    address: string;
-    complete_time: Date;
-    con_id: number;
-    consignee: string;
-    contact: string;
-    cover_url: string;
-    create_time: Date;
+    total: number;
+    orders: IOrderItem[];
+}
+
+export interface IOrderItem {
+    coverUrl: string;
+    createTime: string;
     id: number;
-    mer_id: number;
     payment: number;
     state: string;
+}
+
+export interface IOrderDetail {
+    completeTime: string;
+    consumer: IConsumer;
+    coverUrl: string;
+    createTime: string;
+    id: string;
+    merchant: IMerchant;
+    payment: number;
+    state: string;
+    IOrderDetailItems: IOrderDetailItem[];
+}
+export interface IConsumer {
+    address: string;
+    consignee: string;
+    contact: string;
+    id: number;
+}
+
+export interface IMerchant {
+    id: number;
+    name: string;
+}
+
+export interface IOrderDetailItem {
+    coverUrl: string;
+    quantity: number;
+    price: number;
+    discount: number;
+    merId: number;
+    goodsId: number;
+    name?: string;
+}
+
+export interface IMerchantOrder {
+    complete_time: string;
+    create_time: string;
+    items: IMerchantOrderItem[];
+    order_id: number;
+    state: string;
+    user_name: string;
+}
+
+export interface IMerchantOrderItem {
+    cover_url: string;
+    number: number;
+    single_price: number;
 }

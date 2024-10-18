@@ -53,6 +53,7 @@ const goodsStoreMudule: Module<IGoods, IRootState> = {
                 return;
             }
             commit("changeGoodDetail", res.data);
+            return res.data;
         },
         async getGoodsSearchListAction(
             { commit, state },

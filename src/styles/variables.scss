@@ -1,4 +1,5 @@
 // base color
+// 用户端的颜色系列
 $cus_pink: #feb7bb;
 $cus_lightBlue: #a9e3e4;
 $cus_yellow: #f4de4d;
@@ -6,12 +7,17 @@ $cus_lightPink: #e9e5e2;
 $cus_lightPurple: #bbafd7;
 $cus_blue: #2e74ff;
 $cus_white: #fdfdfd;
+$cus_radius: 10px;
+$cus_background: #fdfdfd;
+$cus_line-grey: #e5e7eb;
 
+// 后台的颜色系列
 $light: #f6f6f9;
 $primary: #1976d2;
 $light-primary: #cfe8ff;
-$grey: #eee;
+$grey: #eee; // 深背景色
 $dark-grey: #aaaaaa;
+$light-blue: #e7ebfd; // table中的特殊浅蓝色
 $dark: #363949;
 $danger: #d32f2f;
 $light-danger: #fecdd3;
@@ -21,9 +27,5 @@ $success: #388e3c;
 $light-success: #bbf7d0;
 
 $dark-light: #181a1e;
-$dark-grey: #25252c;
+// $dark-grey: #25252c;
 $dark-dark: #fbfbfb;
-// base style
-$cus_radius: 10px;
-$cus_background: #fdfdfd;
-$cus_line-grey: #e5e7eb;
