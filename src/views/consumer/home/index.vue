@@ -13,7 +13,6 @@
         category.value = route.params.category as string;
         const params: IgoodsAllListRequest = {
             category: category.value,
-            keyword: "",
             pageNum: pageNum.value,
             pageSize: 15,
         };
@@ -35,7 +34,6 @@
                         return;
                     }
                     pageNum.value++;
-                    console.log("load more", pageNum.value);
                     await changeCardList();
                 }
             },

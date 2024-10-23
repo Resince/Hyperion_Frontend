@@ -1,5 +1,5 @@
 <script setup lang="tsx">
-    import { CSSProperties, ref } from "vue";
+    import { CSSProperties, onMounted, ref } from "vue";
     import { computed } from "vue";
     import { useStore } from "@/store";
     import { JSX } from "vue/jsx-runtime";
@@ -21,6 +21,7 @@
         (e: "handleFilterAdd"): void;
         (e: "handleSearch", i: any): void;
         (e: "handleClickOrder", i: any): void;
+        (e: "handleLoadMore"): void;
     }>();
     // 获取store中的columns
     // 其中包含着列数据和对应的渲染函数
@@ -54,11 +55,29 @@
             </tbody>
         );
     };
+    // 搜索框
     const searchText = ref("");
     const visible = ref(false);
     const handleClickSearch = () => {
         visible.value = !visible.value;
     };
+    // 滚动加载
+    const loadMoreTrigger = ref<HTMLElement | null>(null);
+    onMounted(() => {
+        const observer = new IntersectionObserver(
+            async (entries) => {
+                if (entries[0].isIntersecting) {
+                    emit("handleLoadMore");
+                }
+            },
+            {
+                root: null,
+                rootMargin: "0px",
+                threshold: 1.0,
+            }
+        );
+        observer.observe(loadMoreTrigger.value as HTMLElement);
+    });
 </script>
 <template>
     <div
@@ -105,6 +124,10 @@
             <slot style="display: none"> </slot>
             <!-- 通过自己定义的tsx函数来定义tbody -->
             <DataTable />
+            <div
+                ref="loadMoreTrigger"
+                class="load-more-trigger"
+            ></div>
         </table>
     </div>
 </template>

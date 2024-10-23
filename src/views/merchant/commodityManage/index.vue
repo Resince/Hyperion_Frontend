@@ -18,7 +18,7 @@
     const handleSearch = async (i: any) => {
         await store.dispatch("goodsStoreModule/getGoodsSearchListAction", {
             pageNum: 1,
-            pageSize: 30,
+            pageSize: 15,
             keyword: i,
             category: "",
         });
@@ -33,8 +33,8 @@
     );
     const init = async () => {
         await store.dispatch("goodsStoreModule/getGoodsMerchantListAction", {
-            pagenum: 1,
-            pagesize: 30,
+            pagenum: pageNum.value,
+            pagesize: 5,
         });
     };
     onMounted(() => {
@@ -96,6 +96,15 @@
         }
     };
     const handleClickOrder = async () => {};
+    // 滚动加载
+    const pageNum = ref<number>(1);
+    const handleLoadMore = async () => {
+        if (data.value && data.value.total <= pageNum.value * 5) {
+            return;
+        }
+        pageNum.value++;
+        await init();
+    };
 </script>
 
 <template>
@@ -112,6 +121,7 @@
                 @handleFilterAdd="handleAdd"
                 @handleSearch="handleSearch"
                 @handleClickOrder="handleClickOrder"
+                @handle-load-more="handleLoadMore"
             >
                 <DataTableColumn
                     title="商品信息"

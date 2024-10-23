@@ -50,7 +50,7 @@
         data.value.orders = await store.dispatch(
             "orderStoreModule/getOrderListByMerchantAction",
             {
-                pageSize: 20,
+                pageSize: 40,
                 pageNum: 1,
             }
         );

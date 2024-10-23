@@ -34,19 +34,20 @@ const goodsStoreModule: Module<IGoods, IRootState> = {
             state.goodDetail = goodDetail;
         },
         changeGoodsSearchList(state, payload) {
-            let totalPage = state.goodsSearchList.total;
-            let pageleft =
-                payload.payload.pageSize * (payload.payload.pageNum - 1);
-
             if (payload.payload.pageNum === 1) {
                 state.goodsSearchList = payload.data;
-            } else if (totalPage > pageleft) {
-                console.log(totalPage, pageleft);
-                state.goodsSearchList.items.push(payload.data.items);
+            } else {
+                state.goodsMerchantList.items =
+                    state.goodsSearchList.items.concat(payload.data.items);
             }
         },
         changeGoodsMerchantList(state, payload) {
-            state.goodsMerchantList = payload;
+            if (payload.payload.pageNum === 1) {
+                state.goodsMerchantList = payload.data;
+            } else {
+                state.goodsMerchantList.items =
+                    state.goodsMerchantList.items.concat(payload.data.items);
+            }
         },
     },
     actions: {
@@ -99,7 +100,10 @@ const goodsStoreModule: Module<IGoods, IRootState> = {
             if (res.code !== 0) {
                 return;
             }
-            commit("changeGoodsMerchantList", res.data);
+            commit("changeGoodsMerchantList", {
+                data: res.data,
+                payload: { pageSize: pagesize, pageNum: pagenum },
+            });
             return res.data;
         },
         async updateGoodsAction({}, payload: IUpdateGoods) {
@@ -149,7 +153,7 @@ const goodsStoreModule: Module<IGoods, IRootState> = {
             if (state.goodsSearchList.items) {
                 state.goodsSearchList.items =
                     state.goodsSearchList.items.filter(
-                        (item) => item.state !== "DELETE"
+                        (item) => item.state !== "DELETED"
                     );
             }
             return state.goodsSearchList;
