@@ -1,103 +1,48 @@
 <script setup lang="ts">
     import Main from "@/components/main/index.vue";
     import Container from "@/components/container/index.vue";
-    import DataTable from "@/components/dataTable/table2.vue";
+    import DataTable from "@/components/dataTable/table.vue";
     import Header from "@/components/header/index.vue";
-    import Reminder from "@/components/reminder/index.vue";
+    import DataTableColumn from "@/components/dataTable/tableColumn.vue";
+    import { onMounted, ref } from "vue";
+    import { IUserList } from "@/types";
+    import Status from "@/components/dataTable/status.vue";
+    import { useStore } from "@/store";
 
-    type dataType = {
-        orderHeader: { title: string }[];
-        orders: {
-            id: number;
-            cover_url: string;
-            name: string;
-            date: string;
-            status: string;
-            statusMeg: string;
-            price: number;
-            discount: number;
-            stock: number;
-            total_sales: number;
-        }[];
-        backlog?: {
-            title: string;
-            status: boolean;
-        }[];
+    const store = useStore();
+    const data = ref<IUserList>({} as IUserList);
+    const init = async () => {
+        data.value = await store.dispatch("getUserListAction", {
+            pageNum: 1,
+            pageSize: 10,
+        });
     };
-    const data: dataType = {
-        orderHeader: [
-            { title: "商品信息" },
-            { title: "商品描述" },
-            { title: "商品价格" },
-            { title: "商品折扣" },
-            { title: "库存数量" },
-            { title: "状态" },
-            { title: "总销量" },
-        ],
-        orders: [
-            {
-                id: 1,
-                cover_url: "https://via.placeholder.com/150",
-                name: "商品1",
-                date: "2021-10-10",
-                status: "completed",
-                statusMeg: "已完成",
-                price: 100,
-                discount: 0.8,
-                stock: 100,
-                total_sales: 100,
-            },
-            {
-                id: 2,
-                cover_url: "https://via.placeholder.com/150",
-                name: "商品2",
-                date: "2021-10-10",
-                status: "process",
-                statusMeg: "进行中",
-                price: 100,
-                discount: 0.8,
-                stock: 100,
-                total_sales: 100,
-            },
-            {
-                id: 3,
-                cover_url: "https://via.placeholder.com/150",
-                name: "商品3",
-                date: "2021-10-10",
-                status: "pending",
-                statusMeg: "待处理",
-                price: 100,
-                discount: 0.8,
-                stock: 100,
-                total_sales: 100,
-            },
-        ],
-        backlog: [
-            { title: "任务1", status: false },
-            { title: "任务2", status: true },
-            { title: "任务3", status: false },
-        ],
-    };
+    onMounted(() => {
+        init();
+    });
     const handleTableFilter = () => {
         console.log("filter");
     };
-    const handleTableSearch = () => {
-        console.log("search");
+    const handleTableSearch = async (i: string) => {
+        data.value = await store.dispatch("getUserListAction", {
+            pageNum: 1,
+            pageSize: 10,
+            search: i,
+        });
     };
     const handleClickOrder = (i: number) => {
         console.log("click order", i);
     };
-    const handleReminderFilter = () => {
-        console.log("filter");
-    };
-    const handleReminderPlus = () => {
-        console.log("plus");
-    };
-    const handleMoreOptions = (i: number) => {
-        console.log("more options", i);
-    };
-    const handleToggleStatus = (i: number) => {
-        console.log("toggle status", i);
+    const handleDelete = async (id: number) => {
+        await store.dispatch("deleteUserAction", id);
+        // 将删除后的state修改为DELETE
+        data.value.items = data.value.items.map((item) => {
+            if (item.id === id) {
+                item.state = "DELETE";
+            }
+            return item;
+        });
+        console.log("delete");
     };
 </script>
 
@@ -108,25 +53,77 @@
             <DataTable
                 :title="'用户管理'"
                 :titleIcon="'bx-receipt'"
-                :header="data.orderHeader"
-                :orders="data.orders"
-                :flexBasis="'500px'"
-                @handleFilter="handleTableFilter"
+                :orders="data.items"
+                flexBasis="700px"
+                @handleFilterAdd="handleTableFilter"
                 @handleSearch="handleTableSearch"
                 @handleClickOrder="handleClickOrder"
-            />
-            <Reminder
-                :title="'用户详情'"
-                :titleIcon="'bx-note'"
-                :backlog="data.backlog"
-                :flexBasis="'300px'"
-                @handleFilter="handleReminderFilter"
-                @handlePlus="handleReminderPlus"
-                @handleMoreOptions="handleMoreOptions"
-                @toggleStatus="handleToggleStatus"
-            />
+            >
+                <DataTableColumn
+                    title="用户ID"
+                    width="10%"
+                    label="id"
+                ></DataTableColumn>
+                <DataTableColumn
+                    title="用户名"
+                    width="11%"
+                    label="name"
+                ></DataTableColumn>
+                <DataTableColumn
+                    title="角色"
+                    width="12%"
+                    label="role"
+                ></DataTableColumn>
+                <DataTableColumn
+                    title="邮箱"
+                    width="12%"
+                    label="email"
+                ></DataTableColumn>
+                <DataTableColumn
+                    title="电话"
+                    width="12%"
+                    label="tel"
+                ></DataTableColumn>
+                <DataTableColumn
+                    title="最后登录时间"
+                    width="12%"
+                    label="lastLogin"
+                ></DataTableColumn>
+                <DataTableColumn
+                    title="状态"
+                    width="12%"
+                    label="state"
+                >
+                    <template #default="{ row }">
+                        <Status :row="row"></Status>
+                    </template>
+                </DataTableColumn>
+                <DataTableColumn
+                    title="操作"
+                    width="12%"
+                    label="lastLogin"
+                >
+                    <template #default="{ row }">
+                        <button
+                            @click="handleDelete(row.id)"
+                            class="UserdeleteButton"
+                        >
+                            删除
+                        </button>
+                    </template>
+                </DataTableColumn>
+            </DataTable>
         </Container>
     </Main>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+    .UserdeleteButton {
+        background-color: #ff4d4f;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 4px 8px;
+        cursor: pointer;
+    }
+</style>

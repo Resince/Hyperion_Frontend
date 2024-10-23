@@ -1,19 +1,37 @@
 <script setup lang="ts">
-    defineProps<{
+    import { ref } from "vue";
+    const p = defineProps<{
         row: {
             state: string;
+            sale: string;
         };
     }>();
-    const convertStatus = (state: string) => {
-        switch (state) {
-            case "completed":
+    // 该组件逻辑为根据传入的状态值，显示不同的状态
+    // 如果是state为
+    const t = ref<string>(p.row.state);
+    const convertStatus = () => {
+        switch (p.row.state) {
+            case "DELETED":
+                return "已删除";
+            case "PLACED":
+                return "待用户支付";
+            case "CONFIRMED":
+                return "待商家发货";
+            case "SHIPPED":
+                return "待用户收货";
+            case "COMPLETE":
                 return "已完成";
-            case "process":
-                return "进行中";
-            case "pending":
-                return "待处理";
-            default:
-                return "未知";
+        }
+        t.value = p.row.sale;
+        switch (p.row.sale) {
+            case "ON":
+                return "上架";
+            case "OFF":
+                return "下架";
+        }
+        switch (p.row.state) {
+            case "ACTIVE":
+                return "活跃中";
         }
     };
 </script>
@@ -21,9 +39,9 @@
 <template>
     <span
         class="state"
-        :class="row.state"
+        :class="t"
     >
-        {{ convertStatus(row.state) }}
+        {{ convertStatus() }}
         <slot></slot>
     </span>
 </template>
@@ -35,17 +53,13 @@
         color: $light;
         border-radius: 20px;
         font-weight: 700;
-    }
-
-    .state.completed {
-        background: $success;
-    }
-
-    .state.process {
         background: $primary;
     }
-
-    .state.pending {
+    .state.COMPLETE {
+        background: $success;
+    }
+    .state.OFF,
+    .state.DELETED {
         background: $warning;
     }
 </style>

@@ -14,16 +14,16 @@
     const selectValuePro = ref<number>();
     const selectValueCity = ref<number>();
     const selectValueDis = ref<number>();
-    const optionsPro = ref();
-    const optionsCity = ref();
-    const optionsDis = ref();
+    const optionsPro = ref([{ value: 1, label: "北京" }]);
+    const optionsCity = ref([{ value: 2, label: "北京" }]);
+    const optionsDis = ref([{ value: 3, label: "北京" }]);
     // 地址信息更新处理
     const init = async () => {
         // 初始化省份数据
         optionsPro.value = await store
-            .dispatch("addressStoreModule/reqAreaListAction", 0)
+            .dispatch("addressStoreMudule/reqAreaListAction")
             .then((res) => {
-                return res.map((item: any) => {
+                return res.data.map((item: any) => {
                     return {
                         value: item.id,
                         label: item.name,
@@ -31,14 +31,11 @@
                 });
             });
     };
-    watch(selectValuePro, async () => {
+    watch(selectValuePro, async (val) => {
         optionsCity.value = await store
-            .dispatch(
-                "addressStoreModule/reqAreaListAction",
-                selectValuePro.value
-            )
+            .dispatch("addressStoreMudule/reqAreaListAction", val)
             .then((res) => {
-                return res.map((item: any) => {
+                return res.data.map((item: any) => {
                     return {
                         value: item.id,
                         label: item.name,
@@ -48,9 +45,9 @@
     });
     watch(selectValueCity, async (val) => {
         optionsDis.value = await store
-            .dispatch("addressStoreModule/reqAreaListAction", val)
+            .dispatch("addressStoreMudule/reqAreaListAction", val)
             .then((res) => {
-                return res.map((item: any) => {
+                return res.data.map((item: any) => {
                     return {
                         value: item.id,
                         label: item.name,
@@ -78,8 +75,8 @@
             });
             return;
         }
-        if (!props.id)
-            await store.dispatch("addressStoreModule/resAddAddressAction", {
+        if (props.id)
+            await store.dispatch("addressStoreMudule/reqAddAddressAction", {
                 provId: selectValuePro.value,
                 cityId: selectValueCity.value,
                 distId: selectValueDis.value,
@@ -89,24 +86,17 @@
                 userId: store.getters.gId,
             });
         else
-            await store.dispatch("addressStoreModule/resUpdateAddressAction", {
+            await store.dispatch("addressStoreMudule/reqEditAddressAction", {
                 id: props.id,
-                props: {
-                    provId: selectValuePro.value,
-                    cityId: selectValueCity.value,
-                    distId: selectValueDis.value,
-                    detail: inputAddress.value,
-                    consignee: inputName.value,
-                    contact: inputPhone.value,
-                    userId: store.getters.gId,
-                },
+                provId: selectValuePro.value,
+                cityId: selectValueCity.value,
+                distId: selectValueDis.value,
+                detail: inputAddress.value,
+                consignee: inputName.value,
+                contact: inputPhone.value,
+                userId: store.getters.gId,
             });
         visible.value = false;
-        selectValueCity.value = undefined;
-        selectValueDis.value = undefined;
-        inputAddress.value = "";
-        inputName.value = "";
-        inputPhone.value = "";
     };
     onMounted(() => {
         init();

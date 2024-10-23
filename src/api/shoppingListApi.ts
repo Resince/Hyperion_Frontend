@@ -1,16 +1,16 @@
 import { IDataType } from "@/types";
 import request from "../utils/request";
-import { IShoppingList, IShoppingListItem } from "@/types/shoppingList";
+import { IShoppingListReq, IShoppingListItem } from "@/types/shoppingList";
 
 export const postShoppingList = (
     id: number,
     quantity: number
-): Promise<IDataType<IShoppingList>> => {
+): Promise<IDataType<IShoppingListReq>> => {
     return request({
         url: `/trolley/add`,
         method: "post",
         data: {
-            goods_id: id,
+            id: id,
             quantity: quantity,
         },
     });
@@ -29,18 +29,21 @@ type restype = {
 };
 export const deleteShoppingList = (id: number): Promise<IDataType<restype>> => {
     return request({
-        url: `/trolley/delete/?goodsId=${id}`,
+        url: `/trolley/delete`,
         method: "delete",
+        data: {
+            goodsId: id,
+        },
     });
 };
 
 export const updateShoppingList = (
     id: number,
     quantity: number
-): Promise<IDataType<IShoppingList>> => {
+): Promise<IDataType<IShoppingListReq>> => {
     return request({
         url: `/trolley/update`,
-        method: "post",
+        method: "put",
         data: {
             id: id,
             quantity: quantity,

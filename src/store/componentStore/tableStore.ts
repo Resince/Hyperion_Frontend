@@ -2,7 +2,7 @@ import { IRootState } from "@/types";
 import { ITableStore } from "@/types/table";
 import { Module } from "vuex";
 
-const tableStoreMudule: Module<ITableStore, IRootState> = {
+const tableStoreModule: Module<ITableStore, IRootState> = {
     namespaced: true,
     state() {
         return {
@@ -22,4 +22,4 @@ const tableStoreMudule: Module<ITableStore, IRootState> = {
     },
 };
 
-export default tableStoreMudule;
+export default tableStoreModule;

@@ -22,18 +22,41 @@ export interface IDataType<T = any> {
 
 /**
  * @interface IRootState
- * @param id 用户id
  * @param name 用户名
  * @param tel 用户电话
  * @param email 用户邮箱
  * @param role 用户角色
  */
 export interface IRootState {
-    id: number;
     name: string;
     tel: string;
     email: string;
     role?: string;
+}
+
+// 用户列表类型
+export interface IUserList {
+    items: IUserListItem[];
+    total: number;
+}
+
+export interface IUserListItem {
+    id: number;
+    name: string;
+    pass: string;
+    email: string;
+    lastLogin: string;
+    role: string;
+    state: string;
+    tel: string;
+}
+// 用户列表请求参数类型
+export interface IUserListReq {
+    pageNum: number;
+    pageSize: number;
+    role?: string;
+    search?: string;
+    state?: string;
 }
 
 export interface IRootWithModule {

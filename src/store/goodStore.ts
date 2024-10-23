@@ -1,53 +1,53 @@
 import { Module } from "vuex";
-import { goodsSearchItem, IGoods } from "@/types/goods";
+import {
+    IAddGoods,
+    IGoods,
+    IGoodsList,
+    IgoodsDetail,
+    IUpdateGoods,
+} from "@/types/goods.ts";
 import { IRootState } from "@/types/index";
-import { reqCategoryList, reqGoodsDetail, reqGoodsList } from "@/api/goodsApi";
+import {
+    reqAddGoods,
+    reqCategoryList,
+    reqDeleteGoods,
+    reqGoodsDetail,
+    reqGoodsList,
+    reqOnSaleGoods,
+    reqUpdateGoods,
+    reqUploadImage,
+} from "@/api/goodsApi";
 import { IgoodsAllListRequest } from "@/types/goods";
 
-const goodsStoreMudule: Module<IGoods, IRootState> = {
+const goodsStoreModule: Module<IGoods, IRootState> = {
     namespaced: true,
     state() {
         return {
-            goodDetail: [],
-            goodsSearchList: [],
-            goodsMerchantList: [],
-            pageNum: 0,
-            pageSize: 0,
+            goodDetail: {} as IgoodsDetail,
+            goodsSearchList: {} as IGoodsList,
+            goodsMerchantList: {} as IGoodsList,
         };
     },
     mutations: {
         changeGoodDetail(state, goodDetail) {
-            state.goodDetail.push(goodDetail);
-            // 保持goodDetail的长度为2
-            if (state.goodDetail.length > 3) state.goodDetail.shift();
+            state.goodDetail = goodDetail;
         },
-        changeGoodsSearchList(state, { res, payload }) {
-            state.goodsSearchList.push({ key: payload, value: res.data });
-            // 保持goodsSearchList的长度为2
-            if (state.goodsSearchList.length > 3) state.goodsSearchList.shift();
+        changeGoodsSearchList(state, payload) {
+            state.goodsSearchList = payload;
         },
-        changeGoodsMerchantList(
-            state,
-            { goodsMerchantList, pagenum, pagesize }
-        ) {
-            state.goodsMerchantList = goodsMerchantList.data;
-            state.pageNum = pagenum;
-            state.pageSize = pagesize;
+        changeGoodsMerchantList(state, payload) {
+            state.goodsMerchantList = payload;
         },
     },
     actions: {
         async getGoodsDetailAction(
-            { commit, state },
+            { commit },
             { id, role }: { id: number; role: string }
         ) {
             if (!id || !role) {
                 return;
             }
             // 请求商品详情
-            // 如果商品详情已经存在，则不再请求
-            if (state.goodDetail.some((item) => item.id === id)) {
-                return;
-            }
             const res = await reqGoodsDetail(id, role);
             if (res.code !== 0 || !res.data) {
                 return;
@@ -56,7 +56,7 @@ const goodsStoreMudule: Module<IGoods, IRootState> = {
             return res.data;
         },
         async getGoodsSearchListAction(
-            { commit, state },
+            { commit },
             payload: IgoodsAllListRequest
         ) {
             if (
@@ -67,62 +67,80 @@ const goodsStoreMudule: Module<IGoods, IRootState> = {
                 return;
             }
             // 请求商品列表
-            if (state.goodsSearchList.some((item) => item.key === payload)) {
-                return;
-            }
+            console.log("payload", payload);
+
             const res = await reqCategoryList(payload);
-            commit("changeGoodsSearchList", { res, payload });
+            commit("changeGoodsSearchList", res.data);
+            return res.data;
         },
         async getGoodsMerchantListAction(
-            { commit, state },
+            { commit },
             { pagesize, pagenum }: { pagesize: number; pagenum: number }
         ) {
             if (!pagesize || !pagenum) {
                 return;
             }
             // 请求商品列表
-            if (state.pageNum === pagenum && state.pageSize === pagesize) {
+            const res = await reqGoodsList(pagesize, pagenum);
+            commit("changeGoodsMerchantList", res.data);
+            console.log(res.data);
+
+            return res.data;
+        },
+        async updateGoodsAction({}, payload: IUpdateGoods) {
+            // 请求更新商品
+            if (!payload) {
                 return;
             }
-            const res = await reqGoodsList(pagenum, pagesize);
-            commit("changeGoodsMerchantList", { res, pagenum, pagesize });
+            await reqUpdateGoods(payload);
+        },
+        async onSaleGoodsAction({}, payload: { id: number }) {
+            if (!payload) {
+                return;
+            }
+            console.log(payload.id);
+
+            await reqOnSaleGoods(payload.id);
+        },
+        async offSaleGoodsAction({}, payload: { id: number }) {
+            if (!payload) {
+                return;
+            }
+            console.log(payload.id);
+
+            await reqOnSaleGoods(payload.id);
+        },
+        async addGoodsAction({}, payload: IAddGoods) {
+            if (!payload) {
+                return;
+            }
+            await reqAddGoods(payload);
+        },
+        async uploadGoodsImgAction({}, payload: FormData) {
+            if (!payload) {
+                return;
+            }
+            const res = await reqUploadImage(payload);
+            return res.data;
+        },
+        async deleteGoodsAction({}, payload: { id: number }) {
+            if (!payload) {
+                return;
+            }
+            await reqDeleteGoods(payload.id);
         },
     },
     getters: {
-        gGoodDetail: (state) => (id: number) => {
-            return state.goodDetail.find((item) => item.id === id);
+        gGoodDetail: (state) => {
+            return state.goodDetail;
         },
-        gGoodsSearchList:
-            (state) =>
-            (payload: IgoodsAllListRequest): goodsSearchItem | undefined => {
-                return state.goodsSearchList.find(
-                    (item) =>
-                        item.key.category === payload.category &&
-                        item.key.keyword === payload.keyword &&
-                        item.key.pageNum === payload.pageNum &&
-                        item.key.pageSize === payload.pageSize
-                );
-            },
-        gGoodsMerchantList(
-            state,
-            payload: { pagesize: number; pagenum: number }
-        ) {
-            if (
-                state.pageNum === payload.pagenum &&
-                state.pageSize === payload.pagesize
-            ) {
-                return state.goodsMerchantList;
-            } else {
-                return [];
-            }
+        gGoodsSearchList: (state) => {
+            return state.goodsSearchList;
         },
-        gPageNum(state) {
-            return state.pageNum;
-        },
-        gPageSize(state) {
-            return state.pageSize;
+        gGoodsMerchantList(state) {
+            return state.goodsMerchantList;
         },
     },
 };
 
-export default goodsStoreMudule;
+export default goodsStoreModule;

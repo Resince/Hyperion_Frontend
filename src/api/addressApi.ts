@@ -27,8 +27,9 @@ export const reqSetdefault = (
     id: number
 ): Promise<IDataType<reqSetdefaultRes>> => {
     return request({
-        url: "/address/default/" + id.toString(),
+        url: "/address/default",
         method: "post",
+        params: { id },
     });
 };
 
@@ -47,25 +48,24 @@ export const reqUpdateAddress = (
     return request({
         url: "/address/update",
         method: "post",
-        data: { props, id },
+        data: { id, ...props },
     });
 };
 
-export const reqDeleteAddress = (data: {
-    id: number;
-    userId: number;
-}): Promise<IDataType> => {
+export const reqDeleteAddress = (id: number): Promise<IDataType> => {
     return request({
-        url: "/address/delete/",
+        url: "/address/delete",
         method: "delete",
-        data,
+        params: {
+            id: id,
+        },
     });
 };
 
-export const reqAreaList = (id?: number): Promise<IDataType<any>> => {
+export const reqAreaList = (parentId?: number): Promise<IDataType<any>> => {
     return request({
         url: "/area/list",
         method: "get",
-        params: id,
+        params: { parentId },
     });
 };

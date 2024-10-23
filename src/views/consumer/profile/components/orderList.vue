@@ -3,59 +3,46 @@
     import { onMounted, ref } from "vue";
     import { useStore } from "@/store";
     import { useRouter } from "vue-router";
+    import { OrderState } from "@/types/enum";
     const router = useRouter();
     const store = useStore();
     const data = ref<IOrder>({
         total: 4,
-        orders: [
-            {
-                id: 1,
-                coverUrl: "https://img.yzcdn.cn/vant/ipad.jpeg",
-                state: "待付款",
-                createTime: "2021-10-10",
-                payment: 1,
-            },
-            {
-                id: 2,
-                coverUrl: "https://img.yzcdn.cn/vant/ipad.jpeg",
-                state: "待收货",
-                createTime: "2021-10-10",
-                payment: 1,
-            },
-            {
-                id: 3,
-                coverUrl: "https://img.yzcdn.cn/vant/ipad.jpeg",
-                state: "待评价",
-                createTime: "2021-10-10",
-                payment: 1,
-            },
-            {
-                id: 4,
-                coverUrl: "https://img.yzcdn.cn/vant/ipad.jpeg",
-                state: "已完成",
-                createTime: "2021-10-10",
-                payment: 1,
-            },
-        ],
+        items: [],
     });
     const init = async () => {
         data.value = await store.dispatch(
             "orderStoreModule/getOrderListAction",
-            { pageSize: 10, pageNum: 1, state: "notPay" }
+            { pageSize: 10, pageNum: 1, state: OrderState.PLACED.toString() }
         );
     };
     onMounted(() => {
         init();
     });
     const handleOnClickDetail = (id: number) => {
+        console.log(id);
+
         router.push({ name: "ConsumerOrderDetails", params: { id: id } });
-        console.log("查看详情", id);
     };
-    const handleOnClickClass = async (type: string) => {
+    const handleOnClickClass = async (type: OrderState) => {
         data.value = await store.dispatch(
             "orderStoreModule/getOrderListAction",
-            { pageSize: 10, pageNum: 1, state: type }
+            { pageSize: 10, pageNum: 1, state: type.toString() }
         );
+    };
+    const trans = (i: string) => {
+        switch (i) {
+            case OrderState.PLACED.toString():
+                return "待付款";
+            case OrderState.CONFIRMED.toString():
+                return "待发货";
+            case OrderState.SHIPPED.toString():
+                return "待收货";
+            case OrderState.COMPLETE.toString():
+                return "已完成";
+            default:
+                return "未知状态";
+        }
     };
 </script>
 <template>
@@ -64,25 +51,25 @@
         <div class="orderlist-header">
             <button
                 class="cell notPay"
-                @click="handleOnClickClass('notpay')"
+                @click="handleOnClickClass(OrderState.PLACED)"
             >
                 <h1>待付款</h1>
             </button>
             <button
                 class="cell notReceive"
-                @click="handleOnClickClass('notReceive')"
+                @click="handleOnClickClass(OrderState.CONFIRMED)"
+            >
+                <h1>待发货</h1>
+            </button>
+            <button
+                class="cell notComment"
+                @click="handleOnClickClass(OrderState.SHIPPED)"
             >
                 <h1>待收货</h1>
             </button>
             <button
-                class="cell notComment"
-                @click="handleOnClickClass('notComment')"
-            >
-                <h1>待评价</h1>
-            </button>
-            <button
                 class="cell completed"
-                @click="handleOnClickClass('completed')"
+                @click="handleOnClickClass(OrderState.COMPLETE)"
             >
                 <h1>已完成</h1>
             </button>
@@ -90,7 +77,7 @@
         <div class="orders">
             <div
                 class="orders-rows"
-                v-for="i in data.orders"
+                v-for="i in data.items"
             >
                 <div class="img item">
                     <img
@@ -99,7 +86,7 @@
                     />
                 </div>
                 <div class="msg item">
-                    <div class="state">{{ i.state }}</div>
+                    <div class="state">{{ trans(i.state) }}</div>
                     <div class="price">{{ i.payment }}</div>
                 </div>
                 <button

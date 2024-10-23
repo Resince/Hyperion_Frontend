@@ -1,8 +1,16 @@
+/**
+ * 用户获取订单列表
+ * @interface IOrder
+ */
 export interface IOrder {
     total: number;
-    orders: IOrderItem[];
+    items: IOrderItem[];
 }
 
+/**
+ * 用户获取的订单item
+ * @interface IOrderDetail
+ */
 export interface IOrderItem {
     coverUrl: string;
     createTime: string;
@@ -20,7 +28,7 @@ export interface IOrderDetail {
     merchant: IMerchant;
     payment: number;
     state: string;
-    IOrderDetailItems: IOrderDetailItem[];
+    goodsList: IOrderDetailItem[];
 }
 export interface IConsumer {
     address: string;
@@ -41,20 +49,33 @@ export interface IOrderDetailItem {
     discount: number;
     merId: number;
     goodsId: number;
-    name?: string;
+    name: string;
 }
 
-export interface IMerchantOrder {
-    complete_time: string;
-    create_time: string;
-    items: IMerchantOrderItem[];
-    order_id: number;
+/**
+ * 商家获取订单列表
+ * @interface IMerchantOrder
+ */
+export interface IMerchantOrderList {
+    items: IMerchantOrderListItem[];
+    total: number;
+}
+
+export interface IMerchantOrderListItem {
+    address: string;
+    completeTime: string;
+    consignee: string;
+    createTime: string;
+    items: IMerchantOrderListItemItem[];
+    orderId: number;
     state: string;
-    user_name: string;
+    userName: string;
 }
 
-export interface IMerchantOrderItem {
-    cover_url: string;
+export interface IMerchantOrderListItemItem {
+    coverUrl: string;
+    id: number;
+    name: string;
     number: number;
-    single_price: number;
+    singlePrice: number;
 }

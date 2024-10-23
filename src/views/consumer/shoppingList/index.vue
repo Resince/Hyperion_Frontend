@@ -11,18 +11,36 @@
     const router = useRouter();
     const data = ref<IShoppingListItem[]>([]);
     const shoppingListLength = ref<number>(0);
-    const selectedGoods = ref<Set<number>>(new Set());
+    // 初始化数据
     const initeData = async () => {
-        await store.dispatch("ShoppingListMudule/getShoppingList");
-        data.value = store.getters["ShoppingListMudule/shoppingList"];
+        data.value = await store.dispatch("ShoppingListModule/getShoppingList");
         shoppingListLength.value = data.value.length;
     };
     onMounted(() => {
         initeData();
     });
-    const handleSort = (i: string) => {
-        console.log("sort by", i);
+
+    let sortState: { [key: string]: number } = {
+        singlePrice: 1,
+        quantity: 1,
+        price: 1,
     };
+    const handleSort = (i: keyof IShoppingListItem) => {
+        sortState[i] = sortState[i] * -1;
+
+        data.value.sort((a, b) => {
+            return sortState[i] * (Number(a[i]) - Number(b[i]));
+        });
+    };
+    watch(
+        () => store.getters["ShoppingListModule/shoppingList"],
+        () => {
+            console.log("watch");
+        }
+    );
+
+    // 全选
+    const selectedGoods = ref<Set<number>>(new Set());
     const handleSelectAll = () => {
         if (selectAll.value) {
             data.value.map((item) => {
@@ -53,7 +71,7 @@
                 price += foundItem.price;
             }
         });
-        return price;
+        return price.toFixed(2);
     };
     const cauculateDiscount = () => {
         let discount = 0;
@@ -62,19 +80,41 @@
             if (!foundItem) return;
             discount += foundItem.discount * foundItem.price;
         });
-        return discount;
+        return discount.toFixed(2);
     };
     function handleClickGood(id: number) {
-        router.push({ name: "GoodsDetails", params: { id: id } });
+        router.push({
+            name: "GoodsDetails",
+            params: { id: id },
+        });
     }
-    function handleClickDelete(id: number) {
+    const handleClickDelete = async (id: number) => {
         data.value = data.value.filter((item) => item.id !== id);
-    }
-    const handlePay = () => {
-        store.commit(
-            "ShoppingListMudule/changeOrderList",
-            selectedGoods.value
+        selectedGoods.value.delete(id);
+        shoppingListLength.value = data.value.length;
+        await store.dispatch("ShoppingListModule/deleteShoppingList", {
+            id: id,
+        });
+    };
+    const handleClickDeleteAll = async () => {
+        data.value = data.value.filter(
+            (item) => !selectedGoods.value.has(item.id)
         );
+        // 删除所有选中的商品
+        const promises: any[] = [];
+        data.value.forEach((i) => {
+            promises.push(
+                store.dispatch("ShoppingListModule/deleteShoppingList", i.id)
+            );
+        });
+        await Promise.all(promises);
+
+        selectedGoods.value.clear();
+        shoppingListLength.value = data.value.length;
+    };
+    const handlePay = () => {
+        if (selectedGoods.value.size === 0) return;
+        store.commit("ShoppingListModule/changeOrderList", selectedGoods.value);
         router.push({ name: "Pay" });
     };
 </script>
@@ -86,7 +126,7 @@
                 我的购物车({{ shoppingListLength }})
             </h1>
             <div class="shoppingList-header-action">
-                <button
+                <!-- <button
                     class="shoppingList-header-action-button"
                     @click="handleFilter"
                 >
@@ -107,7 +147,7 @@
                             points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"
                         />
                     </svg>
-                </button>
+                </button> -->
             </div>
         </div>
         <div class="shoppingList-tableview">
@@ -124,16 +164,13 @@
                 <div class="product-cell describe">介绍</div>
                 <div class="product-cell singlePrice">
                     单价
-                    <SortButton @sort="handleSort('singlePrice')" />
+                    <SortButton @sort="handleSort('price')" />
                 </div>
                 <div class="product-cell quantity">
                     数量
                     <SortButton @sort="handleSort('quantity')" />
                 </div>
-                <div class="product-cell price">
-                    小计
-                    <SortButton @sort="handleSort('price')" />
-                </div>
+                <div class="product-cell price">小计</div>
                 <div class="product-cell action">操作</div>
             </div>
             <Tablerow
@@ -145,7 +182,12 @@
             />
         </div>
         <div class="shoppingList-footer">
-            <button class="selected-delete">删除选中</button>
+            <button
+                class="selected-delete"
+                @click="handleClickDeleteAll"
+            >
+                删除选中
+            </button>
             <div class="selected-msg">
                 <div class="selected-quantity">
                     已选择

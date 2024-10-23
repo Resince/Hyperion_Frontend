@@ -2,14 +2,7 @@ import LoginRegister from "@/views/login/index.vue";
 import ConsumerLayout from "@/layouts/consumerLayout/index.vue";
 import ConsumerHome from "@/views/consumer/home/index.vue";
 import MerchantLayout from "@/layouts/managerLayout/index.vue";
-import path from "path";
-import { pa } from "element-plus/es/locales.mjs";
 const routes = [
-    {
-        path: "/test",
-        name: "test",
-        component: () => import("@/views/consumer/home/components/card.vue"),
-    },
     {
         path: "/",
         redirect: "/login",
@@ -18,6 +11,11 @@ const routes = [
         path: "/login",
         name: "LoginRegister",
         component: LoginRegister,
+    },
+    {
+        path: "/xixi",
+        name: "AdminLogin",
+        component: () => import("@/views/login/adminLogin.vue"),
     },
     {
         path: "/consumer",
@@ -31,6 +29,7 @@ const routes = [
                 path: "home/:category",
                 name: "ConsumerHome",
                 component: ConsumerHome,
+                props: true,
             },
             {
                 path: "shoppinglist",
@@ -60,7 +59,7 @@ const routes = [
                 name: "ConsumerOrderDetails",
                 component: () =>
                     import("@/views/consumer/orderDetails/index.vue"),
-                params: true,
+                props: true,
             },
         ],
     },
@@ -90,10 +89,11 @@ const routes = [
                     import("@/views/merchant/orderManage/index.vue"),
             },
             {
-                path: "orderdetails",
+                path: "orderdetails/:id",
                 name: "MerchantOrderDetails",
                 component: () =>
                     import("@/views/merchant/orderDetails/index.vue"),
+                params: true,
             },
         ],
     },

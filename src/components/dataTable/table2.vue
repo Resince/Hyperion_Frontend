@@ -18,12 +18,10 @@
     /**
      * @emits handleFilter 返回筛选事件
      * @emits handleSearch 返回搜索事件
-     * @emits handleClickOrder 返回点击订单事件, 参数为订单id
      */
     const emit = defineEmits<{
         (e: "handleFilter"): void;
         (e: "handleSearch"): void;
-        (e: "handleClickOrder", i: any): void;
     }>();
 </script>
 
@@ -35,11 +33,7 @@
                 :class="props.titleIcon"
             ></i>
             <h3>{{ props.title }}</h3>
-            <i
-                class="bx bx-filter"
-                @click="emit('handleFilter')"
-            ></i>
-            <i
+                <i
                 class="bx bx-search"
                 @click="emit('handleSearch')"
             ></i>

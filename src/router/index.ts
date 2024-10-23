@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import routes from "./router";
 import store from "../store";
+import { getToken } from "@/utils/cache";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -13,16 +14,14 @@ const router = createRouter({
 
 // 路由守卫，让没有登录的登录
 router.beforeEach(async (to, _from) => {
-    if (to.meta.role === "ADMIN") {
-        return;
-    }
     if (store.getters.gRole === "") {
         await store.dispatch("initUserInfoAction");
     }
     const role = store.getters.gRole;
-    const id = store.getters.gId;
-    const isAuthenticated = !!id;
+    const token = getToken();
+    const isAuthenticated = !!token;
     console.log(to.fullPath);
+    console.log(role, to.meta.role);
 
     if (
         // 需要登录和鉴权的页面

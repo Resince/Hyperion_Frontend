@@ -1,14 +1,12 @@
 <script setup lang="ts">
-    import { ref } from "vue";
-    import Inslights from "@/components/insights/index.vue";
+    defineProps<{
+        id: number;
+    }>();
+    import { onMounted, ref } from "vue";
     import Header from "@/components/header/index.vue";
     import Main from "@/components/main/index.vue";
-    import Container from "@/components/container/index.vue";
     import DataTable from "@/components/dataTable/table.vue";
-    import Reminder from "@/components/reminder/index.vue";
     import DataTableColumn from "@/components/dataTable/tableColumn.vue";
-    import { liColor } from "@/types/enum";
-    import Status from "@/components/dataTable/status.vue";
     import Card from "@/components/card/index.vue";
     const activeStep = ref(1);
     const data = ref({
@@ -42,6 +40,12 @@
                 status: 4,
             },
         ],
+    });
+    const init = async () => {
+        console.log("init");
+    };
+    onMounted(() => {
+        init();
     });
 </script>
 

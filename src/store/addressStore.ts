@@ -11,7 +11,7 @@ import {
     reqUpdateAddress,
 } from "@/api/addressApi";
 
-const addressStoreMudule: Module<IAddressState, IRootState> = {
+const addressStoreModule: Module<IAddressState, IRootState> = {
     namespaced: true,
     state() {
         return {
@@ -58,7 +58,7 @@ const addressStoreMudule: Module<IAddressState, IRootState> = {
             if (res.code !== 0 || !res.data) {
                 return;
             }
-            dispatch("reqAddressListAction");
+            await dispatch("reqAddressListAction");
             return res.data;
         },
         async resUpdateAddressAction(
@@ -69,18 +69,17 @@ const addressStoreMudule: Module<IAddressState, IRootState> = {
             if (res.code !== 0 || !res.data) {
                 return;
             }
-            dispatch("reqAddressListAction");
+            await dispatch("reqAddressListAction");
             return res.data;
         },
-        async resDeleteAddressAction(
-            { dispatch },
-            data: { id: number; userId: number }
-        ) {
-            const res = await reqDeleteAddress(data);
+        async resDeleteAddressAction({ dispatch }, id: number) {
+            const res = await reqDeleteAddress(id);
             if (res.code !== 0 || !res.data) {
                 return;
             }
-            dispatch("reqAddressListAction");
+            console.log(id);
+
+            await dispatch("reqAddressListAction");
             return res.data;
         },
     },
@@ -91,4 +90,4 @@ const addressStoreMudule: Module<IAddressState, IRootState> = {
     },
 };
 
-export default addressStoreMudule;
+export default addressStoreModule;

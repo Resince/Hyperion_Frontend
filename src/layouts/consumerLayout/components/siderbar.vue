@@ -17,46 +17,50 @@
     const category = [
         {
             title: "新加入",
-            path: "/consumer/home/:new",
+            path: "/consumer/home/new",
             icon: LightningIcon,
         },
         {
             title: "服装",
-            path: "/consumer/home/:clothes",
+            path: "/consumer/home/clothes",
             icon: ClotheIcon,
         },
         {
             title: "数码",
-            path: "/consumer/home/:digtal",
+            path: "/consumer/home/digtal",
             icon: DigtalIcon,
         },
         {
             title: "家居",
-            path: "/consumer/home/:furniture",
+            path: "/consumer/home/furniture",
             icon: FurnitureIcon,
         },
         {
             title: "美妆",
-            path: "/consumer/home/:cosmetic",
+            path: "/consumer/home/cosmetic",
             icon: CosmeticIcon,
         },
         {
             title: "食品",
-            path: "/consumer/home/:food",
+            path: "/consumer/home/food",
             icon: FoodIcon,
         },
         {
             title: "图书",
-            path: "/consumer/home/:books",
+            path: "/consumer/home/books",
             icon: BooksIcon,
         },
     ];
 
     const isInvalidPath = () => {
-        const path = useRoute().path;
-        if (path.split("/")[2] === "home")
-            return category.filter((item) => item.path === path).length === 0;
-        else return false;
+        const route = useRoute();
+        const c = route.params.category;
+        category.map((i) => {
+            if (i.path.split("/")[3] === c) {
+                return true;
+            }
+        });
+        return false;
     };
 
     const router = useRouter();

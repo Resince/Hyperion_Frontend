@@ -2,16 +2,18 @@
     import { useStore } from "@/store";
     import { IAddressListItem } from "@/types/address";
     import AddressDialog from "./addressDialog.vue";
-    import { onMounted, reactive, ref } from "vue";
+    import { onMounted, reactive, ref, watch } from "vue";
     import { useRouter } from "vue-router";
     const store = useStore();
     const emits = defineEmits(["handleShowAddress"]);
     const dialogFormVisible = ref(false);
     const dialogSelectVisible = ref(false);
-    const type = ref("name");
-    const handleEditInfo = (t: string) => {
+    const type = ref<keyof typeof data.value>("name");
+    const handleEditInfo = (t: "name" | "phone" | "address" | "email") => {
         dialogFormVisible.value = true;
         type.value = t;
+        console.log(type.value);
+        console.log(data.value[type.value]);
     };
     const transform = (val: string) => {
         switch (val) {
@@ -21,14 +23,25 @@
                 return "昵称";
             case "phone":
                 return "手机号码";
+            case "email":
+                return "邮箱";
             default:
         }
     };
     const form = reactive({
         name: "",
     });
-    const handleChangeInfo = () => {
+    const handleChangeInfo = async () => {
         dialogFormVisible.value = false;
+        await store.dispatch("updateUserInfoAction", {
+            name: type.value == "name" ? form.name : store.getters.gName,
+            tel: type.value == "phone" ? form.name : store.getters.gTel,
+            email: type.value == "email" ? form.name : store.getters.gEmail,
+        });
+        // 改变data
+        data.value[type.value] = form.name;
+        form.name = "";
+        await store.dispatch("initUserInfoAction");
         console.log("change info");
     };
 
@@ -36,27 +49,41 @@
         name: string;
         phone: string;
         address: string;
-        role: string;
+        email: string;
     }>({
         name: "张三",
         phone: "123456789",
         address: "北京市海淀区",
-        role: "普通用户",
+        email: "1234134@qq.com",
     });
     const addressList = ref<IAddressListItem[]>([]);
+    const initAddress = () => {
+        // 初始化地址列表信息
+        addressList.value = store.getters["addressStoreModule/gAddressList"];
+        // 如果有默认地址，显示默认地址
+        // 没有默认地址就显示第一个地址
+        // 没有地址就显示空
+        data.value.address =
+            addressList.value.find((item) => item.isDefault === 1)?.district ||
+            addressList.value[0]?.district ||
+            "无地址";
+    };
     const initeData = async () => {
         // 初始化个人信息
         data.value.name = store.getters.gName;
         data.value.phone = store.getters.gTel;
-        data.value.role = store.getters.gRole;
-        // 初始化地址列表信息
-        addressList.value = store.getters["addressStoreMudule/gAddressList"];
-        data.value.address =
-            addressList.value.find((item) => item.is_default === 1)?.district ||
-            "";
+        data.value.email = store.getters.gEmail;
+        await initAddress();
     };
+    // 监听地址列表信息
+    watch(
+        () => store.getters["addressStoreModule/gAddressList"],
+        () => {
+            initAddress();
+        }
+    );
     onMounted(() => {
-        // initeData();
+        initeData();
     });
     const router = useRouter();
     const loginOut = () => {
@@ -91,6 +118,13 @@
                     </div>
                     <div>{{ data.phone }}</div>
                 </div>
+                <div class="role">
+                    <div>
+                        <h1>邮箱</h1>
+                        <button @click="handleEditInfo('email')">编辑</button>
+                    </div>
+                    <div>{{ data.email }}</div>
+                </div>
                 <div class="address">
                     <div>
                         <h1>收货地址</h1>
@@ -108,12 +142,6 @@
                         {{ data.address }}
                     </div>
                 </div>
-                <div class="role">
-                    <div>
-                        <h1>登录角色</h1>
-                    </div>
-                    <div>{{ data.role }}</div>
-                </div>
             </div>
         </div>
     </div>
@@ -130,12 +158,22 @@
                 <el-input
                     v-model="form.name"
                     autocomplete="off"
+                    :placeholder="data[type]"
+                    clearable
                 />
             </el-form-item>
         </el-form>
         <template #footer>
             <div class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取消</el-button>
+                <el-button
+                    @click="
+                        () => {
+                            dialogFormVisible = false;
+                            form.name = '';
+                        }
+                    "
+                    >取消</el-button
+                >
                 <el-button
                     type="primary"
                     @click="handleChangeInfo()"

@@ -1,19 +1,23 @@
 import { createStore, Store, useStore as useVuexStore } from "vuex";
-import { IRootState, IStoreType } from "@/types/index";
+import { IRootState, IStoreType, IUserListReq } from "@/types/index";
 import loginModule from "./loginStore";
 import registerModule from "./registerStore";
 import { getCache, getToken, setCache } from "@/utils/cache";
-import { updateUserInfoAPI, getUserInfoAPI } from "@/api/userinfoApi";
+import {
+    updateUserInfoAPI,
+    getUserInfoAPI,
+    deleteUserApi,
+    getUserListApi,
+} from "@/api/userinfoApi";
 import ShoppingListModule from "./shoppingListStore";
-import goodsStoreMudule from "./goodStore";
-import tableStoreMudule from "./componentStore/tableStore";
-import addressStoreMudule from "./addressStore";
-import orderStoreMudule from "./orderStore";
+import goodsStoreModule from "./goodStore";
+import tableStoreModule from "./componentStore/tableStore";
+import addressStoreModule from "./addressStore";
+import orderStoreModule from "./orderStore";
 
 const store = createStore<IRootState>({
     state() {
         return {
-            id: 0,
             name: "",
             tel: "",
             email: "",
@@ -21,10 +25,6 @@ const store = createStore<IRootState>({
         };
     },
     mutations: {
-        changeId(state, id: number) {
-            setCache("id", id);
-            state.id = id;
-        },
         changeName(state, name: string) {
             state.name = name;
         },
@@ -42,23 +42,24 @@ const store = createStore<IRootState>({
     actions: {
         async initUserInfoAction({ commit }) {
             console.log("initUserInfoAction");
-            const id = getCache("id");
             const token = getToken();
             const role = getCache("role");
-            if (!token || !id || !role) {
+            if (!token || !role) {
                 return;
             }
             const res = await getUserInfoAPI();
             if (res.code !== 0 || !res.data) {
                 return;
             }
-            commit("changeId", res.data.id);
             commit("changeName", res.data.name);
             commit("changeTel", res.data.tel);
             commit("changeEmail", res.data.email);
             commit("changeRole", role);
         },
-        async updateUserInfoAction({ commit }, payload: IRootState) {
+        async updateUserInfoAction(
+            { commit },
+            payload: { name: string; tel: string; email: string }
+        ) {
             const res = await updateUserInfoAPI(payload);
             if (res.code !== 0) {
                 return;
@@ -67,13 +68,23 @@ const store = createStore<IRootState>({
             commit("changeTel", payload.tel);
             commit("changeEmail", payload.email);
         },
+        async deleteUserAction({}, payload: { id: number }) {
+            const res = await deleteUserApi(payload.id);
+            if (res.code !== 0) {
+                return;
+            }
+        },
+        async getUserListAction({}, payload: IUserListReq) {
+            const res = await getUserListApi(payload);
+            if (res.code !== 0) {
+                return;
+            }
+            return res.data;
+        },
     },
     getters: {
         gRole(state) {
             return state.role;
-        },
-        gId(state) {
-            return state.id;
         },
         gName(state) {
             return state.name;
@@ -81,15 +92,18 @@ const store = createStore<IRootState>({
         gTel(state) {
             return state.tel;
         },
+        gEmail(state) {
+            return state.email;
+        },
     },
     modules: {
         loginModule,
         registerModule,
-        ShoppingListMudule: ShoppingListModule,
-        goodsStoreMudule,
-        tableStoreMudule,
-        addressStoreMudule,
-        orderStoreMudule,
+        ShoppingListModule,
+        goodsStoreModule,
+        tableStoreModule,
+        addressStoreModule,
+        orderStoreModule,
     },
 });
 

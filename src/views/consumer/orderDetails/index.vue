@@ -2,73 +2,74 @@
     import { onMounted, ref } from "vue";
     import { useStore } from "@/store/index.ts";
     import { IOrderDetail } from "@/types/order";
-    const props = defineProps<{ id: string }>();
+    import { OrderState } from "@/types/enum";
+    const props = defineProps<{
+        id: string;
+    }>();
     const store = useStore();
     const data = ref<IOrderDetail>({
-        payment: 83,
-        state: "adipisicing ex dolor velit",
-        createTime: "2024-12-20 02:27:38",
-        completeTime: "2024-08-24 05:12:39",
-        coverUrl: "https://petty-final.name/",
-        consumer: {
-            id: 93,
-            consignee: "nulla in",
-            contact: "velit et qui mollit irure",
-            address: "辽宁省安徽市称多县",
-        },
-        merchant: {
-            id: 76,
-            name: "流定积",
-        },
-        id: "1",
-        IOrderDetailItems: [
+        id: "",
+        createTime: "",
+        completeTime: "",
+        state: "",
+        payment: 0,
+        goodsList: [
             {
-                discount: 0.2,
-                merId: 1111,
-                goodsId: 522,
-                coverUrl: "https://img.yzcdn.cn/vant/ipad.jpeg",
-                price: 500.01,
-                quantity: 2,
-            },
-            {
-                discount: 0.2,
-                merId: 1111,
-                goodsId: 522,
-                coverUrl: "https://img.yzcdn.cn/vant/ipad.jpeg",
-                price: 500.01,
-                quantity: 2,
-            },
-            {
-                discount: 0.2,
-                merId: 1111,
-                goodsId: 522,
-                coverUrl: "https://img.yzcdn.cn/vant/ipad.jpeg",
-                price: 500.01,
-                quantity: 2,
+                coverUrl: "",
+                quantity: 0,
+                price: 0,
+                discount: 0,
+                merId: 0,
+                goodsId: 0,
+                name: "",
             },
         ],
+        consumer: {
+            consignee: "",
+            contact: "",
+            address: "",
+            id: 0,
+        },
+        merchant: {
+            name: "",
+            id: 0,
+        },
+        coverUrl: "",
     });
     const initeData = async () => {
         data.value = await store.dispatch(
-            "orderStoreMudule/getOrderDetailAction",
+            "orderStoreModule/getOrderDetailAction",
             {
                 id: props.id,
             }
         );
-        data.value.IOrderDetailItems.map(async (item) => {
-            await store
-                .dispatch("goodsStoreModule/getGoodsDetailAction", {
-                    id: item.goodsId,
-                    role: "CONSUMER",
-                })
-                .then((res) => {
-                    item.name = res.name;
-                });
-        });
+        console.log(data.value.goodsList);
     };
     onMounted(() => {
         initeData();
     });
+    // 处理订单操作
+    const handleAction = async (id: number, score?: number) => {
+        if (data.value.state === OrderState.PLACED.toString()) {
+            // 未支付去支付
+            await store.dispatch("orderStoreModule/orderPayAction", {
+                orderId: data.value.id,
+            });
+            data.value.state = OrderState.CONFIRMED.toString();
+        } else if (data.value.state === OrderState.SHIPPED.toString()) {
+            // 确认收货
+            await store.dispatch("orderStoreModule/orderReceiveAction", {
+                orderId: data.value.id,
+            });
+            data.value.state = OrderState.COMPLETE.toString();
+        } else if (data.value.state === OrderState.COMPLETE.toString()) {
+            await store.dispatch("orderStoreModule/reviewAction", {
+                orderId: data.value.id,
+                goodsId: id,
+                review: score,
+            });
+        }
+    };
 </script>
 <template>
     <div class="Cus-orderDetail">
@@ -134,7 +135,7 @@
                             商品数量
                         </div>
                     </template>
-                    {{ data.IOrderDetailItems.length }}
+                    {{ data.goodsList.length }}
                 </el-descriptions-item>
                 <el-descriptions-item>
                     <template #label>
@@ -226,11 +227,11 @@
         </div>
         <div>
             <el-table
-                :data="data.IOrderDetailItems"
+                :data="data.goodsList"
                 style="width: 100%"
             >
                 <el-table-column
-                    prop="cover_url"
+                    prop="coverUrl"
                     label="已购商品"
                     width="180"
                 >
@@ -245,11 +246,6 @@
                 <el-table-column
                     prop="name"
                     label="商品名称"
-                    width="400"
-                ></el-table-column>
-                <el-table-column
-                    prop="price"
-                    label="单价"
                     width="200"
                 ></el-table-column>
                 <el-table-column
@@ -262,7 +258,58 @@
                     label="折扣"
                     width="180"
                 ></el-table-column>
+                <el-table-column
+                    prop="price"
+                    label="需付款"
+                    width="200"
+                ></el-table-column>
+                <el-table-column
+                    label="Operations"
+                    v-if="data.state === 'COMPLETE'"
+                >
+                    <template #default="scope">
+                        <el-button
+                            size="small"
+                            @click="handleAction(scope.row.goodsId, 1)"
+                        >
+                            好评
+                        </el-button>
+                        <el-button
+                            size="small"
+                            type="danger"
+                            @click="handleAction(scope.row.goodsId, -1)"
+                        >
+                            差评
+                        </el-button>
+                    </template>
+                </el-table-column>
             </el-table>
+        </div>
+        <div>
+            <el-button
+                v-if="data.state === 'PLACED'"
+                size="large"
+                class="checkout"
+                @click="handleAction"
+            >
+                支付
+            </el-button>
+            <el-button
+                v-if="data.state === 'CONFIRMED'"
+                class="checkout"
+                size="large"
+                @click="handleAction"
+            >
+                等待商家发货
+            </el-button>
+            <el-button
+                v-if="data.state === 'SHIPPED'"
+                class="checkout"
+                size="large"
+                @click="handleAction"
+            >
+                确认收货
+            </el-button>
         </div>
     </div>
 </template>
@@ -294,6 +341,10 @@
                 border: none;
                 border-radius: 7px;
             }
+        }
+        .el-button {
+            width: 200px;
+            margin: auto;
         }
     }
 </style>

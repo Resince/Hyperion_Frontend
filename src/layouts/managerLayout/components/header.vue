@@ -1,6 +1,7 @@
 <script setup lang="ts">
-    import { ref } from "vue";
+    import { onMounted, ref } from "vue";
     import userIcon from "@/assets/icons/userIcon.vue";
+    import { useStore } from "@/store";
     defineProps({
         searchPlaceholder: {
             type: String,
@@ -12,15 +13,20 @@
     const handleSearch = () => {
         console.log(search.value);
     };
-    const data = ref({
-        bellCount: 0,
+    // 获取数据
+    const store = useStore();
+    const userInfo = ref<{ name: string; tel: string; email: string }>({
+        name: "",
+        tel: "",
+        email: "",
     });
-    const handleBellClick = () => {
-        console.log("bell");
-    };
-    const handleProfile = () => {
-        console.log("profile");
-    };
+    onMounted(() => {
+        userInfo.value = {
+            name: store.getters.gName,
+            tel: store.getters.gTel,
+            email: store.getters.gEmail,
+        };
+    });
 </script>
 
 <template>
@@ -45,22 +51,34 @@
                 </button>
             </div>
         </form>
-        <a
-            @click="handleBellClick"
-            class="notif"
+        <el-popover
+            placement="bottom"
+            :width="200"
+            trigger="click"
         >
-            <i class="bx bx-bell"></i>
-            <span class="count">{{ data.bellCount }}</span>
-        </a>
-        <a
-            class="profile"
-            @click="handleProfile"
-        >
-            <userIcon
-                width="25px"
-                height="25px"
-            />
-        </a>
+            <template #reference>
+                <a class="profile">
+                    <userIcon
+                        width="25px"
+                        height="25px"
+                    />
+                </a>
+            </template>
+            <el-descriptions
+                title="用户信息"
+                :column="1"
+            >
+                <el-descriptions-item label="用户名">{{
+                    userInfo.name
+                }}</el-descriptions-item>
+                <el-descriptions-item label="联系方式">{{
+                    userInfo.tel
+                }}</el-descriptions-item>
+                <el-descriptions-item label="邮箱">{{
+                    userInfo.email
+                }}</el-descriptions-item>
+            </el-descriptions>
+        </el-popover>
     </nav>
 </template>
 

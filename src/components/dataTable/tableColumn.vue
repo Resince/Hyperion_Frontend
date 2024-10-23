@@ -5,6 +5,7 @@
         title: string;
         width: string;
         label: string;
+        filter?: [];
     }>();
     const store = useStore();
     // 插槽函数，用于对子组件传递的插槽进行定义
@@ -21,7 +22,7 @@
             children = slots.default({ row: row });
         } else {
             // 仅仅渲染列对应的数据
-            children = <span>{row[props.label]}</span>;
+            children = <span style={{}}>{row[props.label]}</span>;
         }
         return children;
     };
@@ -35,14 +36,16 @@
         title: string;
         width: string;
         label: string;
+        filter?: [];
         renderCell?: (row: any) => JSX.Element;
     } = {
         title: props.title,
         width: props.width,
         label: props.label,
+        filter: props.filter,
     };
     item.renderCell = renderCell;
-    store.commit("tableStoreMudule/pushColumns", item);
+    store.commit("tableStoreModule/pushColumns", item);
 </script>
 
 <template></template>

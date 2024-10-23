@@ -1,6 +1,6 @@
 import request from "@/utils/request";
 import { IDataType } from "@/types";
-import { IMerchantOrder, IOrder } from "@/types/order";
+import { IMerchantOrderList, IOrder } from "@/types/order";
 export const getOrderList = (
     pageSize: number,
     pageNum: number,
@@ -16,7 +16,9 @@ export const getOrderList = (
 };
 
 export const getOrderDetail = (id: number) => {
-    return request.get<IDataType<IOrder>>(`/order/consumer/detail`, {
+    console.log(id);
+
+    return request.get<IDataType<IOrder>>(`/order/detail`, {
         params: {
             id,
         },
@@ -28,7 +30,7 @@ export const getOrderListByMerchant = (
     pageNum: number,
     state: string
 ) => {
-    return request.get<IDataType<IMerchantOrder>>(`/order/consumer/list`, {
+    return request.get<IDataType<IMerchantOrderList>>(`/order/merchant/list`, {
         params: {
             pageSize,
             pageNum,
@@ -38,38 +40,41 @@ export const getOrderListByMerchant = (
 };
 
 export const createOrder = (addrId: number, goodsIdList: number[]) => {
-    return request.post<IDataType>("/order/add", {
+    console.log(addrId, goodsIdList);
+    return request.post<IDataType<any>>("/order/add", {
         addrId,
         goodsIdList,
     });
 };
 
-export const orderPay = (orderId: number) => {
-    return request.patch<IDataType>("/order/pay", {
-        orderId,
-    });
+export const orderPay = (id: number) => {
+    return request.patch<IDataType>(`/order/pay?id=${id}`);
 };
 
-export const orderReceive = (orderId: number) => {
-    return request.patch<IDataType>("/order/receive", {
-        orderId,
-    });
+export const orderReceive = (id: number) => {
+    return request.patch<IDataType>(`/order/receive?id=${id}`);
 };
 
-export const orderSent = (orderId: number) => {
-    return request.patch<IDataType>("/order/ship", {
-        orderId,
-    });
+export const orderSent = (id: number) => {
+    return request.patch<IDataType>(`/order/ship?id=${id}`);
 };
 
 export const orderReview = (
     orderId: number,
     goodsId: number,
-    review: string
+    review: number
 ) => {
-    return request.patch<IDataType>("/order/review", {
-        orderId,
-        goodsId,
-        review,
-    });
+    console.log(orderId, goodsId, review);
+
+    return request.patch<IDataType>(
+        "/order/review",
+        { orderId, goodsId, review },
+        {
+            params: {
+                orderId,
+                goodsId,
+                review,
+            },
+        }
+    );
 };

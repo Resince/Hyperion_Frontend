@@ -10,12 +10,12 @@ import { getError } from "./errorTable.ts";
 
 // 暂时没有后端接口，所以这里的baseurl是空的
 const baseurl: string = import.meta.env.DEV
-    ? "http://127.0.0.1:4523/m1/5227230-0-default"
+    ? "http://api.duanyue.top"
     : "http://127.0.0.1:4523/m1/5227230-0-default";
 
 const request = axios.create({
     baseURL: baseurl,
-    timeout: 5000,
+    timeout: 50000,
     headers: {
         "Content-Type": "application/json",
     },
@@ -30,6 +30,9 @@ request.interceptors.request.use(
         const token = getToken();
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
+        } else {
+            ElMessage.error("登录过期，请重新登录");
+            router.push({ name: "LoginRegister" });
         }
         nProgress.start();
         return config;

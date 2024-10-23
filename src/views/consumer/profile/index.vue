@@ -9,7 +9,9 @@
     const showAddress = ref(false);
     onMounted(async () => {
         // 初始化地址表，为了两个子组件之间的信息传递
-        await store.dispatch("addressStoreMudule/reqAddressListAction");
+
+        await store.dispatch("addressStoreModule/reqAddressListAction");
+        console.log("init");
     });
 </script>
 

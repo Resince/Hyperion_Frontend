@@ -1,17 +1,15 @@
 <script setup lang="ts">
-    import { onMounted, ref, watch } from "vue";
+    import { ref, watch } from "vue";
     import Card from "./components/card.vue";
-    import { goodsSearchItem, IgoodsAllListRequest } from "@/types/goods";
+    import { IGoodsList, IgoodsAllListRequest } from "@/types/goods";
     import { useStore } from "@/store";
     import { useRoute } from "vue-router";
     const store = useStore();
     const route = useRoute();
-    const goodsData = ref<goodsSearchItem>();
+    const goodsData = ref<IGoodsList>();
     const category = ref<string>("");
     const changeCardList = async () => {
         category.value = route.params.category as string;
-        category.value = category.value.split(":")[1];
-
         const params: IgoodsAllListRequest = {
             category: category.value,
             keyword: "",
@@ -19,21 +17,31 @@
             pageSize: 10,
         };
         await store.dispatch(
-            "goodsStoreMudule/getGoodsSearchListAction",
+            "goodsStoreModule/getGoodsSearchListAction",
             params
         );
-        goodsData.value =
-            store.getters["goodsStoreMudule/gGoodsSearchList"](params);
     };
-    onMounted(async () => {
-        await changeCardList();
-    });
-
     // 监听路由变化
     watch(
         () => route.params.category,
         async () => {
             await changeCardList();
+        },
+        { immediate: true }
+    );
+
+    // 搜索框搜索商品时，商品列表会变化，同步更新、
+    // 加载商品列表
+    watch(
+        () => store.getters["goodsStoreModule/gGoodsSearchList"],
+        () => {
+            goodsData.value =
+                store.getters["goodsStoreModule/gGoodsSearchList"];
+            if (goodsData.value && goodsData.value.items) {
+                goodsData.value.items = goodsData.value.items.filter(
+                    (item) => item.state !== "DELETED"
+                );
+            }
         }
     );
 </script>
@@ -41,7 +49,7 @@
 <template>
     <div class="grid-container">
         <Card
-            v-for="d in goodsData?.value.items"
+            v-for="d in goodsData?.items"
             size=""
             :data="d"
         />

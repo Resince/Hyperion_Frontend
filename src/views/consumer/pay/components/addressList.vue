@@ -1,7 +1,7 @@
 <script lang="ts" setup>
     import { useStore } from "@/store";
     import { IAddressListItem } from "@/types/address";
-    import { ref, watch } from "vue";
+    import { onMounted, ref } from "vue";
     import {
         Iphone,
         Location,
@@ -10,22 +10,34 @@
     } from "@element-plus/icons-vue";
     import AddressDialog from "./addressDialog.vue";
     const store = useStore();
-    const props = defineProps<{
+    defineProps<{
         showAddress: boolean;
     }>();
     const addressList = ref<IAddressListItem[]>([]);
-    const init = () => {
-        addressList.value = store.getters["addressStoreModule/gAddressList"];
+    const init = async () => {
+        await store.dispatch("addressStoreMudule/reqAddressListAction");
     };
-    watch(
-        () => props.showAddress,
-        () => {
-            if (props.showAddress) {
-                init();
-            }
-        },
-        { immediate: true }
-    );
+    onMounted(() => {
+        init();
+        addressList.value = [
+            {
+                id: 1,
+                consignee: "张三",
+                contact: "123456789",
+                district: "北京市海淀区",
+                detail: "北京市海淀区",
+                is_default: 1,
+            },
+            {
+                id: 2,
+                consignee: "李四",
+                contact: "123456789",
+                district: "北京市海淀区",
+                detail: "北京市海淀区",
+                is_default: 0,
+            },
+        ];
+    });
     const visible = ref(false);
     const itemAddress = ref<IAddressListItem>();
     const handleChangeAddress = (item: IAddressListItem) => {
@@ -35,26 +47,20 @@
     const handleSetDefault = (id: number) => {
         addressList.value = addressList.value.map((item) => {
             if (item.id === id) {
-                item.isDefault = 1;
+                item.is_default = 1;
             } else {
-                item.isDefault = 0;
+                item.is_default = 0;
             }
             return item;
         });
-        store.dispatch("addressStoreModule/resSetDefaultAction", id);
-    };
-    const handleDeleteAddress = async (item: IAddressListItem) => {
-        await store.dispatch(
-            "addressStoreModule/resDeleteAddressAction",
-            item.id
-        );
+        store.dispatch("addressStoreMudule/resSetDefaultAction", id);
     };
 </script>
 
 <template>
     <div
         class="addressList"
-        :class="{ listWrapper: props.showAddress }"
+        :class="{ listWrapper: showAddress }"
         :style="{
             maxHeight: showAddress ? '500px' : '0px',
             overflow: showAddress ? 'visible' : 'hidden',
@@ -62,7 +68,7 @@
     >
         <el-descriptions
             :title="
-                '收货地址' + index + (item.isDefault === 1 ? '(默认地址)' : '')
+                '收货地址' + index + (item.is_default === 1 ? '(默认地址)' : '')
             "
             style="padding-bottom: 20px"
             :column="3"
@@ -71,14 +77,6 @@
             v-for="(item, index) in addressList"
         >
             <template #extra>
-                <el-popconfirm
-                    title="Are you sure to delete this?"
-                    @confirm="handleDeleteAddress(item)"
-                >
-                    <template #reference>
-                        <el-button type="primary">删除</el-button>
-                    </template>
-                </el-popconfirm>
                 <el-button
                     type="primary"
                     @click="handleChangeAddress(item)"

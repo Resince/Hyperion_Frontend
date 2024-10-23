@@ -1,4 +1,4 @@
-import { IDataType } from "@/types";
+import { IDataType, IUserList, IUserListReq } from "@/types";
 import request from "@/utils/request";
 import { IRootState } from "@/types";
 
@@ -20,5 +20,25 @@ export const updateUserInfoAPI = (
             tel: data.tel,
             email: data.email,
         },
+    });
+};
+
+export const deleteUserApi = (id: number): Promise<IDataType> => {
+    return request({
+        url: "/admin/user/delete",
+        method: "delete",
+        params: {
+            id,
+        },
+    });
+};
+
+export const getUserListApi = (
+    data: IUserListReq
+): Promise<IDataType<IUserList>> => {
+    return request({
+        url: "/admin/user/list",
+        method: "get",
+        params: data,
     });
 };

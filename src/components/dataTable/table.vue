@@ -1,5 +1,5 @@
 <script setup lang="tsx">
-    import { CSSProperties, onMounted, ref } from "vue";
+    import { CSSProperties, ref } from "vue";
     import { computed } from "vue";
     import { useStore } from "@/store";
     import { JSX } from "vue/jsx-runtime";
@@ -9,21 +9,22 @@
         titleIcon: string;
         flexBasis?: string;
         tbodyMaxHeight?: string;
+        iconAdd?: boolean;
         orders?: Array<{ id: number; [key: string]: any }>;
     }>();
     /**
      * @emits handleFilter 返回筛选事件
-     * @emits handleSearch 返回搜索事件
+     * @emits  返回搜索事件
      * @emits handleClickOrder 返回点击订单事件, 参数为订单id
      */
     const emit = defineEmits<{
-        (e: "handleFilter"): void;
-        (e: "handleSearch"): void;
+        (e: "handleFilterAdd"): void;
+        (e: "handleSearch", i: any): void;
         (e: "handleClickOrder", i: any): void;
     }>();
     // 获取store中的columns
     // 其中包含着列数据和对应的渲染函数
-    const columns = ref(store.state.tableStoreMudule.columns);
+    const columns = ref(store.getters["tableStoreModule/columns"]);
     const styleScroll = computed<CSSProperties | undefined>(() => {
         return {
             display: "block",
@@ -40,7 +41,7 @@
                         key={order.id}
                         onClick={() => emit("handleClickOrder", order.id)}
                     >
-                        {columns.value.map((column, index) => (
+                        {columns.value.map((column: any, index: any) => (
                             <td
                                 key={index}
                                 style={{ width: column.width }}
@@ -52,6 +53,11 @@
                 ))}
             </tbody>
         );
+    };
+    const searchText = ref("");
+    const visible = ref(false);
+    const handleClickSearch = () => {
+        visible.value = !visible.value;
     };
 </script>
 <template>
@@ -67,12 +73,20 @@
             ></i>
             <h3>{{ props.title }}</h3>
             <i
-                class="bx bx-filter"
-                @click="emit('handleFilter')"
+                class="bx"
+                :class="props.iconAdd ? 'bx-plus' : ''"
+                @click="emit('handleFilterAdd')"
             ></i>
+            <input
+                class="searchInput"
+                :class="{ visible: visible }"
+                v-model="searchText"
+                placeholder="搜索商品信息"
+                @keyup.enter="emit('handleSearch', searchText)"
+            />
             <i
                 class="bx bx-search"
-                @click="emit('handleSearch')"
+                @click="handleClickSearch"
             ></i>
         </div>
         <table>
@@ -109,7 +123,22 @@
             align-items: center;
             gap: 16px;
             margin-bottom: 24px;
-
+            .searchInput {
+                background: $grey;
+                border-radius: 36px;
+                width: 0px;
+                color: $dark;
+                font-size: 18px;
+                padding: 0px;
+                transition: all 0.2s ease-in-out;
+                &.visible {
+                    padding: 3px 16px;
+                    width: 160px;
+                }
+                &::placeholder {
+                    font-size: 15px;
+                }
+            }
             h3 {
                 margin-right: auto;
                 font-size: 24px;

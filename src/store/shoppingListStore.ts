@@ -6,7 +6,7 @@ import {
 } from "@/api/shoppingListApi";
 import { IRootState } from "@/types";
 import {
-    IShoppingList,
+    IShoppingListReq,
     IShoppingListItem,
     IShoppingListType,
 } from "@/types/shoppingList";
@@ -29,9 +29,9 @@ const ShoppingListModule: Module<IShoppingListType, IRootState> = {
                 (item) => item.id !== id
             );
         },
-        changeShoppingList(state, shoppingListItem: IShoppingList) {
+        changeShoppingList(state, shoppingListItem: IShoppingListReq) {
             state.shoppingList = state.shoppingList.map((item) => {
-                if (item.id === shoppingListItem.goods_id) {
+                if (item.id === shoppingListItem.id) {
                     item.quantity = shoppingListItem.quantity;
                 }
                 return item;
@@ -49,6 +49,7 @@ const ShoppingListModule: Module<IShoppingListType, IRootState> = {
                 return;
             }
             commit("initeShoppingList", res.data);
+            return res.data;
         },
         async postShoppingList({}, payload: { id: number; quantity: number }) {
             // 添加物品到购物车
@@ -68,10 +69,7 @@ const ShoppingListModule: Module<IShoppingListType, IRootState> = {
             }
             commit("deleteItem", payload.id);
         },
-        async updateItemsNumber(
-            { commit },
-            payload: { id: number; quantity: number }
-        ) {
+        async updateItemsNumber({}, payload: { id: number; quantity: number }) {
             // 更新购物车
             if (!payload.id || !payload.quantity) {
                 return;
@@ -80,16 +78,15 @@ const ShoppingListModule: Module<IShoppingListType, IRootState> = {
             if (res.code !== 0) {
                 return;
             }
-            commit("changeShoppingList", res.data);
         },
     },
     getters: {
         shoppingList(state) {
             return state.shoppingList;
         },
-        orderList(state) {
-            let orderList = [] as {
-                cover_url: string;
+        list(state) {
+            let list = [] as {
+                coverUrl: string;
                 id: number;
                 name: string;
                 price: number;
@@ -99,17 +96,17 @@ const ShoppingListModule: Module<IShoppingListType, IRootState> = {
             state.orderList.forEach((item) => {
                 const i = state.shoppingList.find((i) => i.id === item);
                 if (i) {
-                    orderList.push({
+                    list.push({
                         id: i.id,
                         quantity: i.quantity,
                         price: i.price,
                         name: i.name,
-                        cover_url: i.cover_url,
+                        coverUrl: i.coverUrl,
                         allPrice: i.price * i.quantity,
                     });
                 }
             });
-            return orderList;
+            return list;
         },
     },
 };

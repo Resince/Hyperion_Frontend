@@ -20,7 +20,7 @@
     const router = useRouter();
     const handleLogout = () => {
         store.commit("loginModule/logout");
-        router.push("/login");
+        router.push({ name: "LoginRegister" });
     };
     onMounted(() => {
         // 根据路由地址设置当前激活的菜单
@@ -42,7 +42,7 @@
             class="logo"
         >
             <i class="bx bx-code-alt"></i>
-            <div class="logo-name"><span>Asmr</span>Prog</div>
+            <div class="logo-name"><span>Hype</span>Rion</div>
         </a>
         <ul class="side-menu">
             <li
@@ -179,6 +179,9 @@
                         color: $danger;
                     }
                 }
+            }
+            .logout {
+                cursor: pointer;
             }
         }
         &.close .side-menu li a {

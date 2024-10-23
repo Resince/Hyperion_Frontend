@@ -45,7 +45,7 @@ export interface IAddressListItem {
     detail: string;
     district: string;
     id: number;
-    is_default: number;
+    isDefault: number;
 }
 
 /**

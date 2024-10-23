@@ -28,9 +28,7 @@
         }
     };
     watch(
-        () => {
-            return selectedGoods.value.has(props.row.id);
-        },
+        () => selectedGoods.value.has(props.row.id),
         () => {
             if (selectedGoods.value.has(props.row.id)) {
                 selected.value = true;
@@ -54,7 +52,7 @@
             @click="emit('handleClickGood', props.row.id)"
         >
             <img
-                :src="props.row.cover_url"
+                :src="props.row.coverUrl"
                 alt=""
             />
             <span>Ocean</span>
@@ -97,6 +95,7 @@
             width: 70px;
             height: 50px;
             border-radius: $cus_radius;
+            object-fit: cover;
         }
         &.image {
             display: flex;

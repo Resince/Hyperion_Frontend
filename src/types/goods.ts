@@ -8,19 +8,12 @@
  * @interface IGoods
  */
 export interface IGoods {
-    goodDetail: IgoodsDetail[];
-    goodsSearchList: goodsSearchItem[];
-    goodsMerchantList: IGoodsListItem[];
-    pageNum?: number;
-    pageSize?: number;
+    goodDetail: IgoodsDetail;
+    goodsSearchList: IGoodsList;
+    goodsMerchantList: IGoodsList;
 }
-export interface goodsSearchItem {
-    key: IgoodsAllListRequest;
-    value: IGoodsAllList;
-}
-
 /**
- * 商品详情相应接口
+ * 商品详情结果相应接口
  * @interface IgoodsDetail
  * @param {string} category - category of the goods
  * @param {string} coverUrl - coverUrl of the goods
@@ -64,62 +57,51 @@ export interface IgoodsAllListRequest {
 }
 
 /**
- * 商品按照类别和关键字查询item接口
- * @interface IGoodsALLListItem
- * @param {string} coverUrl - coverUrl of the goods
- * @param {number} discount - discount of the goods
- * @param {number} id - id of the goods
- * @param {string} name - name of the goods
- * @param {number} price - price of the goods
- * @param {string} desc - desc of the goods
- */
-export interface IGoodsALLListItem {
-    id: number;
-    coverUrl: string;
-    discount: number;
-    name: string;
-    price: number;
-    desc: string;
-}
-
-/**
  * 查询之后的列表接口
- * @interface IGoodsAllList
- * @param {IGoodsItem[]} items - items of the goods
+ * @interface IGoodsList
+ * @param {IGoodsListItem[]} items - items of the goods
  * @param {number} total - total of the goods
  */
-export interface IGoodsAllList {
-    items: IGoodsALLListItem[];
+export interface IGoodsList {
+    items: IGoodsListItem[];
     total: number;
 }
 
 /**
- * 商家查询item接口
+ * 商品查询结果列表接口
  * @interface IGoodsListItem
- * @param {string} cover_url - cover_url of the goods
+ * @param {string} category - category of the goods
+ * @param {string} coverUrl - coverUrl of the goods
  * @param {string} desc - desc of the goods
  * @param {number} discount - discount of the goods
  * @param {number} id - id of the goods
  * @param {string} name - name of the goods
+ * @param {string} negCount - negCount of the goods
+ * @param {string} posCount - posCount of the goods
  * @param {number} price - price of the goods
- * @param {number} quantity - quantity of the goods
- * @param {string} state - state of the goods
- * @param {number} tot_sales - tot_sales of the goods
+ * @param {string} quantity - quantity of the goods
+ * @param {string} state - status of the goods
+ * @param {number} totSales - totSales of the goods
  */
 export interface IGoodsListItem {
-    cover_url: string;
+    category: string;
+    coverUrl: string;
     desc: string;
     discount: number;
     id: number;
     name: string;
+    negCount: number;
+    posCount: number;
     price: number;
     quantity: number;
+    sale: string;
     state: string;
-    tot_sales: number;
+    totSales: number;
+    userId: number;
 }
 
 /**
- * AddGoods interface
+ * 新增商品请求接口
  * @interface IAddGoods
  * @param {string} category - category of the goods
  * @param {string} coverUrl - coverUrl of the goods
@@ -128,24 +110,22 @@ export interface IGoodsListItem {
  * @param {string} name - name of the goods
  * @param {number} price - price of the goods
  * @param {number} quantity - quantity of the goods
- * @param {string} state - "ONSALE" | "OFFSALE"
  */
 export interface IAddGoods {
-    category?: string;
-    coverUrl?: string;
-    desc?: string;
-    discount?: number;
+    category: string;
+    coverUrl: string;
+    desc: string;
+    discount: number;
     name: string;
     price: number;
     quantity: number;
-    state: "ONSALE" | "OFFSALE";
 }
 
 /**
- * UpdateGoods interface
+ * UpdateGoods interface请求参数
  * @interface IUpdateGoods
  * @param {string} category - category of the goods
- * @param {string} cover_url - cover_url of the goods
+ * @param {string} coverUrl - cover_url of the goods
  * @param {string} desc - desc of the goods
  * @param {number} discount - discount of the goods
  * @param {number} id - id of the goods
@@ -154,12 +134,12 @@ export interface IAddGoods {
  * @param {number} quantity - quantity of the goods
  */
 export interface IUpdateGoods {
-    category?: string;
-    cover_url?: string;
-    desc?: string;
-    discount?: number;
+    category: string;
+    coverUrl: string;
+    desc: string;
+    discount: number;
     id: number;
-    name?: string;
-    price?: number;
-    quantity?: number;
+    name: string;
+    price: number;
+    quantity: number;
 }

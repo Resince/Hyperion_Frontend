@@ -3,36 +3,35 @@
     import Main from "@/components/main/index.vue";
     import Container from "@/components/container/index.vue";
     import Header from "@/components/header/index.vue";
-
+    import { onMounted, ref } from "vue";
+    import { IMerchantOrderList, IMerchantOrderListItem } from "@/types/order";
+    import { useStore } from "@/store";
+    import { useRouter } from "vue-router";
+    import { OrderState } from "@/types/enum";
+    import formattedDate from "@/utils/formattedDate.ts";
+    const router = useRouter();
+    const store = useStore();
     const handleFilter = () => {
         console.log("filter");
     };
     const handleSearch = () => {
         console.log("search");
     };
+
+    // 暂时没有该功能
     const handleClickOrder = (i: number) => {
+        router.push({
+            name: "orderDetails",
+            params: { id: i },
+        });
         console.log("click order", i);
     };
+    // 该页面的数据结构
     type dataType = {
         header: { title: string; width: string; label: string }[];
-        orders: orderType[];
+        orders: IMerchantOrderList;
     };
-    type orderType = {
-        complete_time: string;
-        create_time: string;
-        order_id: number;
-        state: string;
-        user_name: string;
-        payee: string;
-        payee_address: string;
-        items: {
-            cover_url: string;
-            number: number;
-            single_price: number;
-            des: string;
-        }[];
-    };
-    const data: dataType = {
+    const data = ref<dataType>({
         header: [
             { title: "订单编号", width: "400px", label: "order_id" },
             { title: "单价", width: "200px", label: "single_price" },
@@ -40,60 +39,52 @@
             { title: "状态", width: "200px", label: "state" },
             { title: "实际收款", width: "200px", label: "aLLprice" },
         ],
-        orders: [
-            {
-                complete_time: "2021-10-10",
-                create_time: "2021-10-10",
-                order_id: 115234523412,
-                state: "completed",
-                user_name: "user1",
-                payee: "张先生收",
-                payee_address: "北京朝阳区五道口",
-                items: [
-                    {
-                        cover_url: "https://via.placeholder.com/150",
-                        number: 1,
-                        single_price: 100,
-                        des: "蒙牛酸奶风味礼盒装200g*12盒",
-                    },
-                    {
-                        cover_url: "https://via.placeholder.com/150",
-                        number: 1,
-                        single_price: 100,
-                        des: "蒙牛酸奶风味礼盒装200g*12盒",
-                    },
-                ],
-            },
-            {
-                complete_time: "2021-10-10",
-                create_time: "2021-10-10",
-                order_id: 115232523412,
-                state: "process",
-                user_name: "user2",
-                payee: "张先生收",
-                payee_address: "北京朝阳区五道口",
-                items: [
-                    {
-                        cover_url: "https://via.placeholder.com/150",
-                        number: 1,
-                        single_price: 100,
-                        des: "蒙牛酸奶风味礼盒装200g*12盒",
-                    },
-                ],
-            },
-        ],
-    };
+        orders: {} as IMerchantOrderList,
+    });
     // 计算总价
-    const totalOrderPrice = (order: orderType) => {
+    const totalOrderPrice = (order: IMerchantOrderListItem) => {
         return order.items.reduce((acc: number, cur) => {
-            return acc + cur.single_price * cur.number;
+            return acc + cur.singlePrice * cur.number;
         }, 0);
+    };
+    const init = async () => {
+        data.value.orders = await store.dispatch(
+            "orderStoreModule/getOrderListByMerchantAction",
+            {
+                pageSize: 10,
+                pageNum: 1,
+            }
+        );
+        console.log(data.value.orders);
+    };
+    onMounted(() => {
+        init();
+    });
+    const handleChangeState = async (order: IMerchantOrderListItem) => {
+        if (order.state == OrderState.CONFIRMED.toString()) {
+            await store.dispatch("orderStoreModule/orderSentAction", {
+                orderId: order.orderId,
+            });
+            order.state = OrderState.SHIPPED.toString();
+        }
+    };
+    const transState = (state: string) => {
+        switch (state) {
+            case OrderState.CONFIRMED.toString():
+                return "待发货";
+            case OrderState.SHIPPED.toString():
+                return "待用户收货";
+            case OrderState.COMPLETE.toString():
+                return "已完成";
+            default:
+                return "未知";
+        }
     };
 </script>
 
 <template>
     <Main>
-        <Header headerTitle="交易管理"</Header>
+        <Header headerTitle="交易管理"></Header>
         <Container>
             <DataTable
                 title="订单列表"
@@ -102,26 +93,28 @@
                 :flexBasis="'100%'"
                 @handleFilter="handleFilter"
                 @handleSearch="handleSearch"
-                @handleClickOrder="handleClickOrder"
             >
                 <tbody class="order-template">
-                    <template v-for="item in data.orders">
+                    <template v-for="item in data.orders.items">
                         <tr class="order-msg">
                             <td>
-                                <div>订单编号: {{ item.order_id }}</div>
-                                <div>买家昵称: {{ item.user_name }}</div>
+                                <div>订单编号: {{ item.orderId }}</div>
+                                <div>买家昵称: {{ item.userName }}</div>
                             </td>
                             <td></td>
                             <td></td>
                             <td>
                                 <span
                                     class="status"
-                                    :class="data.orders[0].state"
+                                    :class="item.state"
+                                    @click="handleChangeState(item)"
                                 >
-                                    {{ data.orders[0].state }}
+                                    {{ transState(item.state) }}
                                 </span>
                             </td>
-                            <td>{{ data.orders[0].create_time }}</td>
+                            <td>
+                                创建时间：{{ formattedDate(item.createTime) }}
+                            </td>
                         </tr>
                         <tr
                             class="goodsList"
@@ -130,21 +123,21 @@
                             <td>
                                 <div>
                                     <img
-                                        :src="goods.cover_url"
+                                        :src="goods.coverUrl"
                                         alt=""
                                     />
-                                    <div>{{ goods.des }}</div>
+                                    <div>{{ goods.name }}</div>
                                 </div>
                             </td>
-                            <td>￥{{ goods.single_price }}</td>
+                            <td>￥{{ goods.singlePrice }}</td>
                             <td>{{ goods.number }}</td>
                             <td></td>
-                            <td>￥{{ goods.single_price * goods.number }}</td>
+                            <td>￥{{ goods.singlePrice * goods.number }}</td>
                         </tr>
                         <tr class="order-address">
                             <td>
-                                <div>收货地址:{{ item.payee_address }}</div>
-                                <div>收货人:{{ item.payee }}</div>
+                                <div>收货地址:{{ item.address }}</div>
+                                <div>收货人:{{ item.consignee }}</div>
                             </td>
                             <td></td>
                             <td></td>
@@ -240,7 +233,7 @@
         tr td .status {
             font-size: 11px;
             padding: 5px 16px;
-            color: $light;
+            color: $dark;
             border-radius: 20px;
             font-weight: 600;
         }

@@ -4,24 +4,26 @@ import {
     getOrderList,
     getOrderListByMerchant,
     orderPay,
+    orderReceive,
     orderReview,
+    orderSent,
 } from "@/api/orderApi";
 import { IRootState } from "@/types";
 import { IOrder } from "@/types/order";
 import { Module } from "vuex";
 
-const orderStoreMudule: Module<IOrder, IRootState> = {
+const orderStoreModule: Module<IOrder, IRootState> = {
     namespaced: true,
     state() {
         return {
             total: 0,
-            orders: [],
+            items: [],
         };
     },
     mutations: {
         changeOrderList(state, payload: IOrder) {
             state.total = payload.total;
-            state.orders = payload.orders;
+            state.items = payload.items;
         },
     },
     actions: {
@@ -56,24 +58,24 @@ const orderStoreMudule: Module<IOrder, IRootState> = {
             {},
             payload: { addrId: number; goodsIdList: number[] }
         ) {
-            await createOrder(payload.addrId, payload.goodsIdList);
+            return await createOrder(payload.addrId, payload.goodsIdList);
         },
         async orderPayAction({}, payload: { orderId: number }) {
             await orderPay(payload.orderId);
         },
         async orderReceiveAction({}, payload: { orderId: number }) {
-            await orderPay(payload.orderId);
+            await orderReceive(payload.orderId);
         },
         async orderSentAction({}, payload: { orderId: number }) {
-            await orderPay(payload.orderId);
+            await orderSent(payload.orderId);
         },
         async reviewAction(
             {},
-            payload: { orderId: number; goodsId: number; review: string }
+            payload: { orderId: number; goodsId: number; review: number }
         ) {
             await orderReview(payload.orderId, payload.goodsId, payload.review);
         },
     },
 };
 
-export default orderStoreMudule;
+export default orderStoreModule;

@@ -5,26 +5,19 @@
 
     const activeTab = ref("login");
     const registerData = reactive({
-        name: "",
-        tel: "",
-        pass: "",
-        email: "",
-        confirmPassword: "",
+        name: "qweqwe",
+        tel: "15279061234",
+        pass: "qwe123123",
+        email: "123@qq.com",
+        confirmPassword: "qwe123123",
         role: "CONSUMER",
     });
     const loginData = reactive({
-        tel: "15279101234",
-        pass: "135sfsefsd",
+        tel: "15279061234",
+        pass: "qwe123123",
         role: "CONSUMER",
     });
-    const handleTabClick = () => {
-        registerData.name = "";
-        registerData.tel = "";
-        registerData.pass = "";
-        registerData.email = "";
-        registerData.confirmPassword = "";
-        registerData.role = "CONSUMER";
-    };
+    const handleTabClick = () => {};
 
     function validateConfirmPassword(_rule: any, value: any, callback: any) {
         if (value === "") {
@@ -79,7 +72,6 @@
     });
     const loginRules = reactive({
         tel: [
-            // { required: true, message: '请输入手机号', trigger: 'blur' },
             {
                 pattern: /^1[3456789]\d{9}$/,
                 message: "请输入正确的手机号",
@@ -100,17 +92,17 @@
             form: loginFormRef.value,
             payload: {
                 tel: loginData.tel,
-                password: loginData.pass,
+                pass: loginData.pass,
                 role: loginData.role,
             },
         });
     const ToRegister = () => {
         store.dispatch("registerModule/registerAction", {
-            registerFormRef: registerFormRef.value,
+            form: registerFormRef.value,
             payload: {
                 name: registerData.name,
                 tel: registerData.tel,
-                password: registerData.pass,
+                pass: registerData.pass,
                 email: registerData.email,
                 role: registerData.role,
             },
