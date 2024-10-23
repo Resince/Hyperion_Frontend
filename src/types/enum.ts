@@ -11,7 +11,6 @@ export enum liStatus {
     FAILED = "failed",
 }
 
-
 /**
  * 订单状态
  * @enum {string}
@@ -26,3 +25,4 @@ export enum OrderState {
     SHIPPED = "SHIPPED",
     COMPLETE = "COMPLETE",
 }
+

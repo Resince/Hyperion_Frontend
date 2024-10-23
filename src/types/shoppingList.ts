@@ -26,11 +26,11 @@ export interface IShoppingListReq {
  * @param {string} state - 商品状态，如果为DELETED则不显示,无法下单
  */
 export interface IShoppingListItem {
-    coverUrl: string;
-    discount: number;
+    coverUrl?: string;
+    discount?: number;
     id: number;
-    name: string;
-    price: number;
+    name?: string;
+    price?: number;
     quantity: number;
-    state: string;
+    state?: string;
 }

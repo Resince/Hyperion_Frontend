@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import routes from "./router";
 import store from "../store";
 import { getToken } from "@/utils/cache";
+import { ElMessage } from "element-plus";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -20,8 +21,6 @@ router.beforeEach(async (to, _from) => {
     const role = store.getters.gRole;
     const token = getToken();
     const isAuthenticated = !!token;
-    console.log(to.fullPath);
-    console.log(role, to.meta.role);
 
     if (
         // 需要登录和鉴权的页面
@@ -39,7 +38,7 @@ router.beforeEach(async (to, _from) => {
         // 没有权限
         role !== to.meta.role
     ) {
-        console.log("没有权限");
+        ElMessage.error("没有权限");
         return { name: "404" };
     }
 });

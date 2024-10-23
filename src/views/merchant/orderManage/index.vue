@@ -24,7 +24,6 @@
             name: "orderDetails",
             params: { id: i },
         });
-        console.log("click order", i);
     };
     // 该页面的数据结构
     type dataType = {
@@ -55,7 +54,6 @@
                 pageNum: 1,
             }
         );
-        console.log(data.value.orders);
     };
     onMounted(() => {
         init();
@@ -76,6 +74,8 @@
                 return "待用户收货";
             case OrderState.COMPLETE.toString():
                 return "已完成";
+            case OrderState.PLACED.toString():
+                return "待用户付款";
             default:
                 return "未知";
         }

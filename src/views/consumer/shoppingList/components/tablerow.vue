@@ -4,11 +4,7 @@
     import { Delete } from "@element-plus/icons-vue";
     import { IShoppingListItem } from "@/types/shoppingList";
     import { watch } from "vue";
-    const selected = ref(false);
-    const selectedGoods = defineModel("selectedGoods", {
-        type: Set<number>,
-        default: new Set(),
-    });
+    // 初始数据和函数
     const props = defineProps<{
         row: IShoppingListItem;
     }>();
@@ -16,6 +12,12 @@
         (e: "handleClickGood", id: number): void;
         (e: "handleClickDelete", id: number): void;
     }>();
+    // 单选和相应全选
+    const selected = ref(false);
+    const selectedGoods = defineModel("selectedGoods", {
+        type: Set<number>,
+        default: new Set(),
+    });
     const handleSelected = () => {
         if (selected.value) {
             selectedGoods.value.add(props.row.id);

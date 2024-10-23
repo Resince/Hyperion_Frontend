@@ -1,19 +1,17 @@
 <script setup lang="ts">
-    import { onMounted, ref } from "vue";
+    import { computed, onMounted, ref } from "vue";
     import { useStore } from "@/store/index.ts";
     import { IAddressListItem } from "@/types/address";
     import { useRouter } from "vue-router";
     const router = useRouter();
     const store = useStore();
     // 初始化地址信息
-    const addressList = ref<IAddressListItem[]>([]);
+    const addressList = computed(() => store.getters["addressStoreModule/gAddressList"]);
     const addressSelected = ref<IAddressListItem>({} as IAddressListItem);
-    const initAddress = async () => {
-        addressList.value = await store.dispatch(
-            "addressStoreModule/reqAddressListAction"
-        );
+const initAddress = async () => {
+        await store.dispatch("addressStoreModule/reqAddressListAction");
         // 默认地址
-        addressList.value.map((item) => {
+        addressList.value.map((item:any) => {
             if (item.isDefault === 1) addressSelected.value = item;
         });
         // 没有默认地址，选择第一个地址

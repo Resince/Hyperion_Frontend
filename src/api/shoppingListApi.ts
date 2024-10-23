@@ -23,15 +23,11 @@ export const getshoppingList = (): Promise<IDataType<IShoppingListItem[]>> => {
     });
 };
 
-type restype = {
-    user_id: number;
-    goods_id: number;
-};
-export const deleteShoppingList = (id: number): Promise<IDataType<restype>> => {
+export const deleteShoppingList = (id: number): Promise<IDataType> => {
     return request({
         url: `/trolley/delete`,
         method: "delete",
-        data: {
+        params: {
             goodsId: id,
         },
     });

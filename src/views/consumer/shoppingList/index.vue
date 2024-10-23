@@ -1,25 +1,32 @@
 <script setup lang="ts">
     import { IShoppingListItem } from "@/types/shoppingList";
-    import SortButton from "./components/sortButton.vue";
+    import SortButton from "@/assets/icons/sortButton.vue";
     import Tablerow from "./components/tablerow.vue";
-    import { onMounted, ref } from "vue";
+    import { computed, onBeforeUnmount, onMounted, onUpdated, ref } from "vue";
     import { useStore } from "@/store";
     import { useRouter } from "vue-router";
     import { watch } from "vue";
     const store = useStore();
-    const selectAll = ref<boolean>(false);
     const router = useRouter();
-    const data = ref<IShoppingListItem[]>([]);
-    const shoppingListLength = ref<number>(0);
     // 初始化数据
     const initeData = async () => {
-        data.value = await store.dispatch("ShoppingListModule/getShoppingList");
-        shoppingListLength.value = data.value.length;
+        await store.dispatch("ShoppingListModule/getShoppingList");
     };
+    const data = computed<IShoppingListItem[]>(
+        () => store.getters["ShoppingListModule/shoppingList"]
+    );
+    const shoppingListLength = computed<number>(() => data.value.length);
     onMounted(() => {
         initeData();
+        console.log("初始化");
     });
-
+    onUpdated(() => {
+        console.log("组件更新");
+    });
+    onBeforeUnmount(() => {
+        console.log("组件卸载");
+    });
+    // 排序
     let sortState: { [key: string]: number } = {
         singlePrice: 1,
         quantity: 1,
@@ -27,23 +34,17 @@
     };
     const handleSort = (i: keyof IShoppingListItem) => {
         sortState[i] = sortState[i] * -1;
-
         data.value.sort((a, b) => {
             return sortState[i] * (Number(a[i]) - Number(b[i]));
         });
     };
-    watch(
-        () => store.getters["ShoppingListModule/shoppingList"],
-        () => {
-            console.log("watch");
-        }
-    );
 
     // 全选
+    const selectAll = ref<boolean>(false);
     const selectedGoods = ref<Set<number>>(new Set());
     const handleSelectAll = () => {
         if (selectAll.value) {
-            data.value.map((item) => {
+            data.value.map((item: any) => {
                 selectedGoods.value.add(item.id);
             });
         } else {
@@ -60,28 +61,26 @@
             }
         }
     );
-    const handleFilter = () => {
-        console.log("filter");
-    };
-    const calculatePrice = () => {
+    // 相应函数
+    const calculatePrice = computed(() => {
         let price = 0;
         selectedGoods.value.forEach((item) => {
             const foundItem = data.value.find((i) => i.id === item);
-            if (foundItem) {
+            if (foundItem?.price) {
                 price += foundItem.price;
             }
         });
         return price.toFixed(2);
-    };
-    const cauculateDiscount = () => {
+    });
+    const calculateDiscount = computed(() => {
         let discount = 0;
         selectedGoods.value.forEach((item) => {
             const foundItem = data.value.find((i) => i.id === item);
-            if (!foundItem) return;
+            if (!foundItem?.discount || !foundItem.price) return;
             discount += foundItem.discount * foundItem.price;
         });
         return discount.toFixed(2);
-    };
+    });
     function handleClickGood(id: number) {
         router.push({
             name: "GoodsDetails",
@@ -89,17 +88,12 @@
         });
     }
     const handleClickDelete = async (id: number) => {
-        data.value = data.value.filter((item) => item.id !== id);
         selectedGoods.value.delete(id);
-        shoppingListLength.value = data.value.length;
         await store.dispatch("ShoppingListModule/deleteShoppingList", {
             id: id,
         });
     };
     const handleClickDeleteAll = async () => {
-        data.value = data.value.filter(
-            (item) => !selectedGoods.value.has(item.id)
-        );
         // 删除所有选中的商品
         const promises: any[] = [];
         data.value.forEach((i) => {
@@ -108,9 +102,7 @@
             );
         });
         await Promise.all(promises);
-
         selectedGoods.value.clear();
-        shoppingListLength.value = data.value.length;
     };
     const handlePay = () => {
         if (selectedGoods.value.size === 0) return;
@@ -196,10 +188,10 @@
                 </div>
                 <div class="selected-price">
                     <div class="selected-price-all">
-                        <span>总价:{{ calculatePrice() }}</span>
+                        <span>总价:{{ calculatePrice }}</span>
                     </div>
                     <div class="selected-price-discount">
-                        促销:<span>{{ cauculateDiscount() }}</span>
+                        促销:<span>{{ calculateDiscount }}</span>
                     </div>
                 </div>
                 <button

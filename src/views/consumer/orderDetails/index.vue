@@ -7,6 +7,7 @@
         id: string;
     }>();
     const store = useStore();
+    // 赋初值，防止报错
     const data = ref<IOrderDetail>({
         id: "",
         createTime: "",
@@ -43,7 +44,6 @@
                 id: props.id,
             }
         );
-        console.log(data.value.goodsList);
     };
     onMounted(() => {
         initeData();

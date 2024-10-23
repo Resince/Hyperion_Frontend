@@ -22,6 +22,15 @@ const addressStoreModule: Module<IAddressState, IRootState> = {
         changeAddressList(state, addressList) {
             state.addressList = addressList;
         },
+        setDefault(state, id) {
+            state.addressList.forEach((item) => {
+                if (item.id === id) {
+                    item.isDefault = 1;
+                } else {
+                    item.isDefault = 0;
+                }
+            });
+        },
     },
     actions: {
         async getAddressDetailAction({}, id: number) {
@@ -46,11 +55,12 @@ const addressStoreModule: Module<IAddressState, IRootState> = {
             }
             return res.data;
         },
-        async resSetDefaultAction({}, id: number) {
+        async resSetDefaultAction({ commit }, id: number) {
             const res = await reqSetdefault(id);
             if (res.code !== 0 || !res.data) {
                 return;
             }
+            commit("setDefault", id);
             return res.data;
         },
         async resAddAddressAction({ dispatch }, props: IAddressReq) {
@@ -77,8 +87,6 @@ const addressStoreModule: Module<IAddressState, IRootState> = {
             if (res.code !== 0 || !res.data) {
                 return;
             }
-            console.log(id);
-
             await dispatch("reqAddressListAction");
             return res.data;
         },

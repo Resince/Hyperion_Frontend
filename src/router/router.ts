@@ -77,13 +77,13 @@ const routes = [
                 component: () => import("@/views/merchant/home/index.vue"),
             },
             {
-                path: "commodityManage",
+                path: "commoditymanage",
                 name: "CommodityManage",
                 component: () =>
                     import("@/views/merchant/commodityManage/index.vue"),
             },
             {
-                path: "orderManage",
+                path: "ordermanage",
                 name: "OrderNanage",
                 component: () =>
                     import("@/views/merchant/orderManage/index.vue"),

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
     import { useStore } from "@/store";
     import { IAddressListItem } from "@/types/address";
-    import { ref, watch } from "vue";
+    import { computed, ref } from "vue";
     import {
         Iphone,
         Location,
@@ -13,19 +13,9 @@
     const props = defineProps<{
         showAddress: boolean;
     }>();
-    const addressList = ref<IAddressListItem[]>([]);
-    const init = () => {
-        addressList.value = store.getters["addressStoreModule/gAddressList"];
-    };
-    watch(
-        () => props.showAddress,
-        () => {
-            if (props.showAddress) {
-                init();
-            }
-        },
-        { immediate: true }
-    );
+    const addressList = computed(() => {
+        return store.getters["addressStoreModule/gAddressList"];
+    });
     const visible = ref(false);
     const itemAddress = ref<IAddressListItem>();
     const handleChangeAddress = (item: IAddressListItem) => {
@@ -33,21 +23,10 @@
         visible.value = true;
     };
     const handleSetDefault = (id: number) => {
-        addressList.value = addressList.value.map((item) => {
-            if (item.id === id) {
-                item.isDefault = 1;
-            } else {
-                item.isDefault = 0;
-            }
-            return item;
-        });
         store.dispatch("addressStoreModule/resSetDefaultAction", id);
     };
-    const handleDeleteAddress = async (item: IAddressListItem) => {
-        await store.dispatch(
-            "addressStoreModule/resDeleteAddressAction",
-            item.id
-        );
+    const handleDeleteAddress = (item: IAddressListItem) => {
+        store.dispatch("addressStoreModule/resDeleteAddressAction", item.id);
     };
 </script>
 

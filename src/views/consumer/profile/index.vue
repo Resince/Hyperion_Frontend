@@ -4,14 +4,18 @@
     import Profile from "./components/profile.vue";
     import OrderList from "./components/orderList.vue";
     import { useStore } from "@/store";
+    import { OrderState } from "@/types/enum";
     const store = useStore();
 
     const showAddress = ref(false);
     onMounted(async () => {
-        // 初始化地址表，为了两个子组件之间的信息传递
-
+        // 初始化该页面所有数据
+        await store.dispatch("orderStoreModule/getOrderListAction", {
+            pageSize: 10,
+            pageNum: 1,
+            state: OrderState.PLACED.toString(),
+        });
         await store.dispatch("addressStoreModule/reqAddressListAction");
-        console.log("init");
     });
 </script>
 

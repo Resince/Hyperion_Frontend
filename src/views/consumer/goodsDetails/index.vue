@@ -1,34 +1,25 @@
 <script setup lang="ts">
     import store from "@/store";
     import { IgoodsDetail } from "@/types/goods";
-    import { IShoppingListItem } from "@/types/shoppingList";
-    import { onMounted, ref } from "vue";
+    import { computed, onMounted, ref } from "vue";
     const props = defineProps<{
         id: string;
     }>();
-    const shoppingList = ref<IShoppingListItem[]>([]);
-    const data = ref<IgoodsDetail>({} as IgoodsDetail);
-    const inShoppingList = ref<boolean>(false);
     const initeData = async () => {
         const role = store.getters.gRole;
-        data.value = await store.dispatch(
-            "goodsStoreModule/getGoodsDetailAction",
-            {
-                id: props.id,
-                role: role,
-            }
-        );
-        shoppingList.value = await store.dispatch(
-            "ShoppingListModule/getShoppingList"
-        );
-        shoppingList.value.forEach((item) => {
-            if (item.id === Number(props.id)) {
-                quantity.value = item.quantity;
-                inShoppingList.value = true;
-                console.log("从购物车中获取到的数量", item.quantity);
-            }
+        await store.dispatch("goodsStoreModule/getGoodsDetailAction", {
+            id: props.id,
+            role: role,
         });
+        await store.dispatch("ShoppingListModule/getShoppingList");
     };
+    const data = computed<IgoodsDetail>(() => {
+        return store.getters["goodsStoreModule/gGoodsDetail"];
+    });
+    const inShoppingList = computed<boolean>(() => {
+        const t = store.getters["ShoppingListModule/shoppingList"];
+        return t.some((item: any) => item.id === Number(props.id));
+    });
     onMounted(() => {
         initeData();
     });
@@ -36,7 +27,7 @@
     const handleAddToShoppingList = async () => {
         if (inShoppingList.value === false) {
             await store.dispatch("ShoppingListModule/postShoppingList", {
-                id: Number(props.id),
+                goodDetails: data.value,
                 quantity: Math.max(1, quantity.value),
             });
         } else {

@@ -5,6 +5,7 @@ import {
     updateShoppingList as uShoppingList,
 } from "@/api/shoppingListApi";
 import { IRootState } from "@/types";
+import { IgoodsDetail } from "@/types/goods";
 import {
     IShoppingListReq,
     IShoppingListItem,
@@ -29,6 +30,15 @@ const ShoppingListModule: Module<IShoppingListType, IRootState> = {
                 (item) => item.id !== id
             );
         },
+        addShoppingList(
+            state,
+            payload: { goodDetails: IgoodsDetail; quantity: number }
+        ) {
+            state.shoppingList.push({
+                id: payload.goodDetails.id,
+                quantity: payload.quantity,
+            });
+        },
         changeShoppingList(state, shoppingListItem: IShoppingListReq) {
             state.shoppingList = state.shoppingList.map((item) => {
                 if (item.id === shoppingListItem.id) {
@@ -51,12 +61,22 @@ const ShoppingListModule: Module<IShoppingListType, IRootState> = {
             commit("initeShoppingList", res.data);
             return res.data;
         },
-        async postShoppingList({}, payload: { id: number; quantity: number }) {
+        async postShoppingList(
+            { commit },
+            payload: { goodDetails: IgoodsDetail; quantity: number }
+        ) {
             // 添加物品到购物车
-            if (!payload.id || !payload.quantity) {
+            if (!payload.goodDetails.id || !payload.quantity) {
                 return;
             }
-            await pShoppingList(payload.id, payload.quantity);
+            const res = await pShoppingList(
+                payload.goodDetails.id,
+                payload.quantity
+            );
+            if (res.code !== 0) {
+                return;
+            }
+            commit("addShoppingList", payload);
         },
         async deleteShoppingList({ commit }, payload: { id: number }) {
             // 删除购物车
@@ -69,7 +89,10 @@ const ShoppingListModule: Module<IShoppingListType, IRootState> = {
             }
             commit("deleteItem", payload.id);
         },
-        async updateItemsNumber({}, payload: { id: number; quantity: number }) {
+        async updateItemsNumber(
+            { commit },
+            payload: { id: number; quantity: number }
+        ) {
             // 更新购物车
             if (!payload.id || !payload.quantity) {
                 return;
@@ -78,6 +101,7 @@ const ShoppingListModule: Module<IShoppingListType, IRootState> = {
             if (res.code !== 0) {
                 return;
             }
+            commit("changeShoppingList", payload);
         },
     },
     getters: {
@@ -99,10 +123,10 @@ const ShoppingListModule: Module<IShoppingListType, IRootState> = {
                     list.push({
                         id: i.id,
                         quantity: i.quantity,
-                        price: i.price,
-                        name: i.name,
-                        coverUrl: i.coverUrl,
-                        allPrice: i.price * i.quantity,
+                        price: i.price || 0,
+                        name: i.name || "",
+                        coverUrl: i.coverUrl || "",
+                        allPrice: (i.price ?? 0) * i.quantity,
                     });
                 }
             });

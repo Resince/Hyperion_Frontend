@@ -1,12 +1,11 @@
 <script setup lang="ts">
-    import { ref, watch } from "vue";
+    import { computed, ref, watch } from "vue";
     import Card from "./components/card.vue";
     import { IGoodsList, IgoodsAllListRequest } from "@/types/goods";
     import { useStore } from "@/store";
     import { useRoute } from "vue-router";
     const store = useStore();
     const route = useRoute();
-    const goodsData = ref<IGoodsList>();
     const category = ref<string>("");
     const changeCardList = async () => {
         category.value = route.params.category as string;
@@ -32,18 +31,13 @@
 
     // 搜索框搜索商品时，商品列表会变化，同步更新、
     // 加载商品列表
-    watch(
-        () => store.getters["goodsStoreModule/gGoodsSearchList"],
-        () => {
-            goodsData.value =
-                store.getters["goodsStoreModule/gGoodsSearchList"];
-            if (goodsData.value && goodsData.value.items) {
-                goodsData.value.items = goodsData.value.items.filter(
-                    (item) => item.state !== "DELETED"
-                );
-            }
+    const goodsData = computed<IGoodsList | null>(() => {
+        const t = store.getters["goodsStoreModule/gGoodsSearchList"];
+        if (t && t.items) {
+            t.items = t.items.filter((item: any) => item.state !== "DELETED");
         }
-    );
+        return t;
+    });
 </script>
 
 <template>

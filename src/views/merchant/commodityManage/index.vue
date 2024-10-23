@@ -5,96 +5,38 @@
     import Container from "@/components/container/index.vue";
     import Status from "@/components/dataTable/status.vue";
     import Header from "@/components/header/index.vue";
-    import { onMounted, ref } from "vue";
+    import { computed, onMounted, ref } from "vue";
     import { useStore } from "@/store";
-    import {
-        IAddGoods,
-        IGoodsList,
-        IGoodsListItem,
-        IUpdateGoods,
-    } from "@/types/goods";
-    import {
-        ElMessage,
-        genFileId,
-        UploadInstance,
-        UploadProps,
-        UploadRawFile,
-    } from "element-plus";
-
+    import { IGoodsList, IGoodsListItem, IUpdateGoods } from "@/types/goods";
+    import DialogAddGood from "./components/dialogAddGood.vue";
+    import { options } from "@/types/dict";
     const store = useStore();
-    // 添加商品
-    const addDataItem = ref<IAddGoods>({} as IAddGoods);
     const addVisible = ref(false);
-    // 上传图片
-    const upload = ref<UploadInstance>();
-    const handleFileUpload = async (file: any) => {
-        // 上传文件
-        const formData = new FormData();
-        formData.append("file", file.file);
-        const url = await store.dispatch(
-            "goodsStoreModule/uploadGoodsImgAction",
-            formData
-        );
-        // 上传成功提醒
-        ElMessage({
-            message: "上传成功",
-            type: "success",
-        });
-        console.log(url);
-
-        addDataItem.value.coverUrl = url;
-    };
-    const handleExceed: UploadProps["onExceed"] = (files) => {
-        upload.value!.clearFiles();
-        const file = files[0] as UploadRawFile;
-        file.uid = genFileId();
-        upload.value!.handleStart(file);
-    };
-    const handleAddGood = async () => {
-        // 如果其中的项为空就返回
-
-        if (!addDataItem.value.coverUrl) return;
-        await store.dispatch(
-            "goodsStoreModule/addGoodsAction",
-            addDataItem.value
-        );
-        addVisible.value = false;
-        init();
-        console.log("add");
-    };
     const handleAdd = () => {
         addVisible.value = !addVisible.value;
-        addDataItem.value = {} as IAddGoods;
     };
     // 搜索商品
     const handleSearch = async (i: any) => {
-        data.value = await store.dispatch(
-            "goodsStoreModule/getGoodsSearchListAction",
-            {
-                pageNum: 1,
-                pageSize: 10,
-                keyword: i,
-                category: "",
-            }
-        );
-    };
-    const handleClickOrder = (i: any) => {
-        console.log("click order", i);
+        await store.dispatch("goodsStoreModule/getGoodsSearchListAction", {
+            pageNum: 1,
+            pageSize: 10,
+            keyword: i,
+            category: "",
+        });
     };
     const handleDelete = async (id: number) => {
         await store.dispatch("goodsStoreModule/deleteGoodsAction", { id });
         init();
     };
     // 数据加载
-    const data = ref<IGoodsList>({} as IGoodsList);
+    const data = computed<IGoodsList>(
+        () => store.getters["goodsStoreModule/gGoodsMerchantList"]
+    );
     const init = async () => {
-        data.value = await store.dispatch(
-            "goodsStoreModule/getGoodsMerchantListAction",
-            {
-                pagenum: 1,
-                pagesize: 10,
-            }
-        );
+        await store.dispatch("goodsStoreModule/getGoodsMerchantListAction", {
+            pagenum: 1,
+            pagesize: 10,
+        });
     };
     onMounted(() => {
         init();
@@ -103,11 +45,14 @@
     const edtiId = ref<number>(-1);
     const editData = ref<IUpdateGoods>({} as IUpdateGoods);
     const handleEdit = async (id: number) => {
+        if (data.value.items.find((i) => i.id == id)?.state === "DELETE") {
+            return;
+        }
         if (edtiId.value != id) {
             // 不同说明第一次点击，或者是点击了另一个
             // 放弃之前的编辑
             // 保存当前的信息
-            const t = data.value?.items?.find((item) => item.id == id);
+            const t = data.value?.items?.find((item: any) => item.id == id);
             if (t) {
                 editData.value = {
                     name: t.name,
@@ -132,18 +77,11 @@
                 editData.value
             );
             // 重新加载数据
-            init();
+            await init();
         }
     };
     const changeSale = async (row: IGoodsListItem) => {
-        if (row.sale == "ON") {
-            row.sale = "OFF";
-        } else {
-            row.sale = "ON";
-        }
-        console.log(row.id);
-
-        if (row.sale == "ON") {
+        if (row.sale === "OFF") {
             await store.dispatch("goodsStoreModule/onSaleGoodsAction", {
                 id: row.id,
             });
@@ -152,37 +90,13 @@
                 id: row.id,
             });
         }
+        if (row.sale == "ON") {
+            row.sale = "OFF";
+        } else {
+            row.sale = "ON";
+        }
     };
-    const options = [
-        {
-            value: "new",
-            label: "新品",
-        },
-        {
-            value: "clothes",
-            label: "服装",
-        },
-        {
-            value: "digtal",
-            label: "数码",
-        },
-        {
-            value: "furniture",
-            label: "家居",
-        },
-        {
-            value: "cosmetic",
-            label: "美妆",
-        },
-        {
-            value: "food",
-            label: "食品",
-        },
-        {
-            value: "books",
-            label: "图书",
-        },
-    ];
+    const handleClickOrder = async () => {};
 </script>
 
 <template>
@@ -370,72 +284,7 @@
             </DataTable>
         </Container>
     </Main>
-    <el-dialog
-        v-model="addVisible"
-        title="添加商品"
-        width="800"
-    >
-        <div class="dialog-select">
-            <el-input
-                v-model="addDataItem.name"
-                style="width: 240px"
-                placeholder="商品名称"
-            />
-            <el-input
-                v-model="addDataItem.desc"
-                style="width: 240px"
-                placeholder="商品描述"
-            />
-            <el-select
-                v-model="addDataItem.category"
-                placeholder="商品分类"
-                style="width: 240px"
-            >
-                <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                />
-            </el-select>
-            <el-input
-                v-model="addDataItem.price"
-                style="width: 240px"
-                placeholder="商品价格"
-            />
-            <el-input
-                v-model="addDataItem.discount"
-                style="width: 240px"
-                placeholder="商品折扣"
-            />
-            <el-input
-                v-model="addDataItem.quantity"
-                style="width: 240px"
-                placeholder="商品数量"
-            />
-            <el-upload
-                class="upload-demo"
-                action="''"
-                ref="upload"
-                :limit="1"
-                :on-exceed="handleExceed"
-                :http-request="handleFileUpload"
-            >
-                <el-button type="primary">上传商品封面</el-button>
-            </el-upload>
-        </div>
-        <template #footer>
-            <div class="dialog-footer">
-                <el-button @click="addVisible = false">取消</el-button>
-                <el-button
-                    type="primary"
-                    @click="handleAddGood()"
-                >
-                    确认
-                </el-button>
-            </div>
-        </template>
-    </el-dialog>
+    <DialogAddGood v-model:addVisible="addVisible"></DialogAddGood>
 </template>
 
 <style lang="scss">

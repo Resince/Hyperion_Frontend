@@ -2,18 +2,17 @@
     import { useStore } from "@/store";
     import { IAddressListItem } from "@/types/address";
     import AddressDialog from "./addressDialog.vue";
-    import { onMounted, reactive, ref, watch } from "vue";
+    import { computed, onMounted, reactive, ref, watch } from "vue";
     import { useRouter } from "vue-router";
     const store = useStore();
     const emits = defineEmits(["handleShowAddress"]);
+
     const dialogFormVisible = ref(false);
     const dialogSelectVisible = ref(false);
     const type = ref<keyof typeof data.value>("name");
     const handleEditInfo = (t: "name" | "phone" | "address" | "email") => {
         dialogFormVisible.value = true;
         type.value = t;
-        console.log(type.value);
-        console.log(data.value[type.value]);
     };
     const transform = (val: string) => {
         switch (val) {
@@ -25,7 +24,6 @@
                 return "手机号码";
             case "email":
                 return "邮箱";
-            default:
         }
     };
     const form = reactive({
@@ -42,7 +40,6 @@
         data.value[type.value] = form.name;
         form.name = "";
         await store.dispatch("initUserInfoAction");
-        console.log("change info");
     };
 
     const data = ref<{
@@ -50,43 +47,37 @@
         phone: string;
         address: string;
         email: string;
-    }>({
-        name: "张三",
-        phone: "123456789",
-        address: "北京市海淀区",
-        email: "1234134@qq.com",
+    }>({} as any);
+
+    // 获取地址列表
+    const addressList = computed<IAddressListItem[]>(() => {
+        return store.getters["addressStoreModule/gAddressList"];
     });
-    const addressList = ref<IAddressListItem[]>([]);
-    const initAddress = () => {
-        // 初始化地址列表信息
-        addressList.value = store.getters["addressStoreModule/gAddressList"];
-        // 如果有默认地址，显示默认地址
-        // 没有默认地址就显示第一个地址
-        // 没有地址就显示空
-        data.value.address =
-            addressList.value.find((item) => item.isDefault === 1)?.district ||
-            addressList.value[0]?.district ||
-            "无地址";
-    };
-    const initeData = async () => {
+    // 初始化开始的默认地址
+    watch(
+        addressList,
+        () => {
+            // 默认地址->第一个地址->空
+            data.value.address =
+                addressList.value.find((item: any) => item.isDefault === 1)
+                    ?.district ||
+                addressList.value[0]?.district ||
+                "无地址";
+        },
+        { immediate: true }
+    );
+    const initeData = () => {
         // 初始化个人信息
         data.value.name = store.getters.gName;
         data.value.phone = store.getters.gTel;
         data.value.email = store.getters.gEmail;
-        await initAddress();
     };
-    // 监听地址列表信息
-    watch(
-        () => store.getters["addressStoreModule/gAddressList"],
-        () => {
-            initAddress();
-        }
-    );
     onMounted(() => {
         initeData();
     });
+
     const router = useRouter();
-    const loginOut = () => {
+    const handleLoginOut = () => {
         store.commit("loginModule/logout");
         router.push({ name: "LoginRegister" });
     };
@@ -101,7 +92,7 @@
         <div class="userinfo">
             <div>
                 <h1>个人信息</h1>
-                <h3 @click="loginOut">登出</h3>
+                <h3 @click="handleLoginOut">登出</h3>
             </div>
             <div class="userinfo-container">
                 <div class="name">

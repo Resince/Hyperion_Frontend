@@ -13,6 +13,7 @@ import {
     reqDeleteGoods,
     reqGoodsDetail,
     reqGoodsList,
+    reqOffSaleGoods,
     reqOnSaleGoods,
     reqUpdateGoods,
     reqUploadImage,
@@ -67,9 +68,10 @@ const goodsStoreModule: Module<IGoods, IRootState> = {
                 return;
             }
             // 请求商品列表
-            console.log("payload", payload);
-
             const res = await reqCategoryList(payload);
+            if (res.code !== 0) {
+                return;
+            }
             commit("changeGoodsSearchList", res.data);
             return res.data;
         },
@@ -82,13 +84,14 @@ const goodsStoreModule: Module<IGoods, IRootState> = {
             }
             // 请求商品列表
             const res = await reqGoodsList(pagesize, pagenum);
+            if (res.code !== 0) {
+                return;
+            }
             commit("changeGoodsMerchantList", res.data);
-            console.log(res.data);
-
             return res.data;
         },
         async updateGoodsAction({}, payload: IUpdateGoods) {
-            // 请求更新商品
+            // 更新商品信息
             if (!payload) {
                 return;
             }
@@ -98,17 +101,13 @@ const goodsStoreModule: Module<IGoods, IRootState> = {
             if (!payload) {
                 return;
             }
-            console.log(payload.id);
-
             await reqOnSaleGoods(payload.id);
         },
         async offSaleGoodsAction({}, payload: { id: number }) {
             if (!payload) {
                 return;
             }
-            console.log(payload.id);
-
-            await reqOnSaleGoods(payload.id);
+            await reqOffSaleGoods(payload.id);
         },
         async addGoodsAction({}, payload: IAddGoods) {
             if (!payload) {
@@ -131,7 +130,7 @@ const goodsStoreModule: Module<IGoods, IRootState> = {
         },
     },
     getters: {
-        gGoodDetail: (state) => {
+        gGoodsDetail: (state) => {
             return state.goodDetail;
         },
         gGoodsSearchList: (state) => {

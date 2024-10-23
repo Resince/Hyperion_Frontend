@@ -8,7 +8,6 @@ import nProgress from "nprogress";
 import { getToken, removeToken } from "./cache.ts";
 import { getError } from "./errorTable.ts";
 
-// 暂时没有后端接口，所以这里的baseurl是空的
 const baseurl: string = import.meta.env.DEV
     ? "http://api.duanyue.top"
     : "http://127.0.0.1:4523/m1/5227230-0-default";

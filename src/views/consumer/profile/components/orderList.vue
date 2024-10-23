@@ -1,34 +1,26 @@
 <script setup lang="ts">
-    import { IOrder } from "@/types/order";
-    import { onMounted, ref } from "vue";
+    import { IOrderItem } from "@/types/order";
+    import { computed } from "vue";
     import { useStore } from "@/store";
     import { useRouter } from "vue-router";
     import { OrderState } from "@/types/enum";
     const router = useRouter();
     const store = useStore();
-    const data = ref<IOrder>({
-        total: 4,
-        items: [],
-    });
-    const init = async () => {
-        data.value = await store.dispatch(
-            "orderStoreModule/getOrderListAction",
-            { pageSize: 10, pageNum: 1, state: OrderState.PLACED.toString() }
-        );
-    };
-    onMounted(() => {
-        init();
-    });
-    const handleOnClickDetail = (id: number) => {
-        console.log(id);
 
+    // 响应index.vue中的onMounted的数据
+    const data = computed<IOrderItem[]>(
+        () => store.getters["orderStoreModule/gOrderList"]
+    );
+
+    const handleOnClickDetail = (id: number) => {
         router.push({ name: "ConsumerOrderDetails", params: { id: id } });
     };
     const handleOnClickClass = async (type: OrderState) => {
-        data.value = await store.dispatch(
-            "orderStoreModule/getOrderListAction",
-            { pageSize: 10, pageNum: 1, state: type.toString() }
-        );
+        await store.dispatch("orderStoreModule/getOrderListAction", {
+            pageSize: 10,
+            pageNum: 1,
+            state: type.toString(),
+        });
     };
     const trans = (i: string) => {
         switch (i) {
@@ -77,7 +69,7 @@
         <div class="orders">
             <div
                 class="orders-rows"
-                v-for="i in data.items"
+                v-for="i in data"
             >
                 <div class="img item">
                     <img

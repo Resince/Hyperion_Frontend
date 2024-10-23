@@ -76,6 +76,14 @@ const orderStoreModule: Module<IOrder, IRootState> = {
             await orderReview(payload.orderId, payload.goodsId, payload.review);
         },
     },
+    getters: {
+        gOrderList(state) {
+            return state.items;
+        },
+        gOrderTotal(state) {
+            return state.total;
+        }
+    },
 };
 
 export default orderStoreModule;
