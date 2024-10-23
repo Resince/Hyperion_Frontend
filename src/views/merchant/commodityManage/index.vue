@@ -15,11 +15,10 @@
     const handleAdd = () => {
         addVisible.value = !addVisible.value;
     };
-    // 搜索商品
     const handleSearch = async (i: any) => {
         await store.dispatch("goodsStoreModule/getGoodsSearchListAction", {
             pageNum: 1,
-            pageSize: 10,
+            pageSize: 30,
             keyword: i,
             category: "",
         });
@@ -35,7 +34,7 @@
     const init = async () => {
         await store.dispatch("goodsStoreModule/getGoodsMerchantListAction", {
             pagenum: 1,
-            pagesize: 10,
+            pagesize: 30,
         });
     };
     onMounted(() => {

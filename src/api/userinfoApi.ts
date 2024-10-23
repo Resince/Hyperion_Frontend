@@ -25,11 +25,8 @@ export const updateUserInfoAPI = (
 
 export const deleteUserApi = (id: number): Promise<IDataType> => {
     return request({
-        url: "/admin/user/delete",
+        url: `/admin/user/delete?id=${id}`,
         method: "delete",
-        params: {
-            id,
-        },
     });
 };
 

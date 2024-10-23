@@ -34,7 +34,16 @@ const goodsStoreModule: Module<IGoods, IRootState> = {
             state.goodDetail = goodDetail;
         },
         changeGoodsSearchList(state, payload) {
-            state.goodsSearchList = payload;
+            let totalPage = state.goodsSearchList.total;
+            let pageleft =
+                payload.payload.pageSize * (payload.payload.pageNum - 1);
+
+            if (payload.payload.pageNum === 1) {
+                state.goodsSearchList = payload.data;
+            } else if (totalPage > pageleft) {
+                console.log(totalPage, pageleft);
+                state.goodsSearchList.items.push(payload.data.items);
+            }
         },
         changeGoodsMerchantList(state, payload) {
             state.goodsMerchantList = payload;
@@ -72,7 +81,10 @@ const goodsStoreModule: Module<IGoods, IRootState> = {
             if (res.code !== 0) {
                 return;
             }
-            commit("changeGoodsSearchList", res.data);
+            commit("changeGoodsSearchList", {
+                data: res.data,
+                payload: payload,
+            });
             return res.data;
         },
         async getGoodsMerchantListAction(
@@ -134,6 +146,12 @@ const goodsStoreModule: Module<IGoods, IRootState> = {
             return state.goodDetail;
         },
         gGoodsSearchList: (state) => {
+            if (state.goodsSearchList.items) {
+                state.goodsSearchList.items =
+                    state.goodsSearchList.items.filter(
+                        (item) => item.state !== "DELETE"
+                    );
+            }
             return state.goodsSearchList;
         },
         gGoodsMerchantList(state) {

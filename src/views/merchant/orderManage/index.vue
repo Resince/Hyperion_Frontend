@@ -44,13 +44,13 @@
     const totalOrderPrice = (order: IMerchantOrderListItem) => {
         return order.items.reduce((acc: number, cur) => {
             return acc + cur.singlePrice * cur.number;
-        }, 0);
+        }, 0).toFixed(2);
     };
     const init = async () => {
         data.value.orders = await store.dispatch(
             "orderStoreModule/getOrderListByMerchantAction",
             {
-                pageSize: 10,
+                pageSize: 20,
                 pageNum: 1,
             }
         );
@@ -132,7 +132,7 @@
                             <td>￥{{ goods.singlePrice }}</td>
                             <td>{{ goods.number }}</td>
                             <td></td>
-                            <td>￥{{ goods.singlePrice * goods.number }}</td>
+                            <td>￥{{ (goods.singlePrice * goods.number).toFixed(2) }}</td>
                         </tr>
                         <tr class="order-address">
                             <td>

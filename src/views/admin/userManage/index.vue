@@ -34,15 +34,14 @@
         console.log("click order", i);
     };
     const handleDelete = async (id: number) => {
-        await store.dispatch("deleteUserAction", id);
+        await store.dispatch("deleteUserAction", { id: id });
         // 将删除后的state修改为DELETE
         data.value.items = data.value.items.map((item) => {
             if (item.id === id) {
-                item.state = "DELETE";
+                item.state = "DELETED";
             }
             return item;
         });
-        console.log("delete");
     };
 </script>
 

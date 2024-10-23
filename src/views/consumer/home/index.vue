@@ -1,25 +1,52 @@
 <script setup lang="ts">
-    import { computed, ref, watch } from "vue";
+    import { computed, onMounted, ref, watch } from "vue";
     import Card from "./components/card.vue";
     import { IGoodsList, IgoodsAllListRequest } from "@/types/goods";
     import { useStore } from "@/store";
     import { useRoute } from "vue-router";
     const store = useStore();
     const route = useRoute();
+    // 数据加载和分页
     const category = ref<string>("");
+    const pageNum = ref<number>(1);
     const changeCardList = async () => {
         category.value = route.params.category as string;
         const params: IgoodsAllListRequest = {
             category: category.value,
             keyword: "",
-            pageNum: 1,
-            pageSize: 10,
+            pageNum: pageNum.value,
+            pageSize: 15,
         };
         await store.dispatch(
             "goodsStoreModule/getGoodsSearchListAction",
             params
         );
     };
+    // 滚动加载
+    const loadMoreTrigger = ref<HTMLElement | null>(null);
+    onMounted(() => {
+        const observer = new IntersectionObserver(
+            async (entries) => {
+                if (entries[0].isIntersecting) {
+                    if (
+                        goodsData.value &&
+                        goodsData.value.total <= pageNum.value * 15
+                    ) {
+                        return;
+                    }
+                    pageNum.value++;
+                    console.log("load more", pageNum.value);
+                    await changeCardList();
+                }
+            },
+            {
+                root: null,
+                rootMargin: "0px",
+                threshold: 1.0,
+            }
+        );
+        observer.observe(loadMoreTrigger.value as HTMLElement);
+    });
     // 监听路由变化
     watch(
         () => route.params.category,
@@ -32,11 +59,7 @@
     // 搜索框搜索商品时，商品列表会变化，同步更新、
     // 加载商品列表
     const goodsData = computed<IGoodsList | null>(() => {
-        const t = store.getters["goodsStoreModule/gGoodsSearchList"];
-        if (t && t.items) {
-            t.items = t.items.filter((item: any) => item.state !== "DELETED");
-        }
-        return t;
+        return store.getters["goodsStoreModule/gGoodsSearchList"];
     });
 </script>
 
@@ -47,6 +70,10 @@
             size=""
             :data="d"
         />
+        <div
+            ref="loadMoreTrigger"
+            class="load-more-trigger"
+        ></div>
     </div>
 </template>
 
