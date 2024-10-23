@@ -35,14 +35,14 @@ const addressStoreModule: Module<IAddressState, IRootState> = {
     actions: {
         async getAddressDetailAction({}, id: number) {
             const res = await reqAddressDetail(id);
-            if (res.code !== 0 || !res.data) {
+            if (res.code !== 0) {
                 return;
             }
             return res.data;
         },
         async reqAddressListAction({ commit }) {
             const res = await reqAddressList();
-            if (res.code !== 0 || !res.data) {
+            if (res.code !== 0) {
                 return;
             }
             commit("changeAddressList", res.data);
@@ -50,14 +50,14 @@ const addressStoreModule: Module<IAddressState, IRootState> = {
         },
         async reqAreaListAction({}, id?: number) {
             const res = await reqAreaList(id);
-            if (res.code !== 0 || !res.data) {
+            if (res.code !== 0) {
                 return;
             }
             return res.data;
         },
         async resSetDefaultAction({ commit }, id: number) {
             const res = await reqSetdefault(id);
-            if (res.code !== 0 || !res.data) {
+            if (res.code !== 0) {
                 return;
             }
             commit("setDefault", id);
@@ -65,7 +65,7 @@ const addressStoreModule: Module<IAddressState, IRootState> = {
         },
         async resAddAddressAction({ dispatch }, props: IAddressReq) {
             const res = await reqAddAddress(props);
-            if (res.code !== 0 || !res.data) {
+            if (res.code !== 0) {
                 return;
             }
             await dispatch("reqAddressListAction");
@@ -76,7 +76,7 @@ const addressStoreModule: Module<IAddressState, IRootState> = {
             { props, id }: { props: IAddressReq; id: number }
         ) {
             const res = await reqUpdateAddress(props, id);
-            if (res.code !== 0 || !res.data) {
+            if (res.code !== 0) {
                 return;
             }
             await dispatch("reqAddressListAction");
@@ -84,7 +84,7 @@ const addressStoreModule: Module<IAddressState, IRootState> = {
         },
         async resDeleteAddressAction({ dispatch }, id: number) {
             const res = await reqDeleteAddress(id);
-            if (res.code !== 0 || !res.data) {
+            if (res.code !== 0) {
                 return;
             }
             await dispatch("reqAddressListAction");

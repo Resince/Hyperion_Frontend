@@ -14,6 +14,8 @@
         showAddress: boolean;
     }>();
     const addressList = computed(() => {
+        console.log(store.getters["addressStoreModule/gAddressList"]);
+
         return store.getters["addressStoreModule/gAddressList"];
     });
     const visible = ref(false);

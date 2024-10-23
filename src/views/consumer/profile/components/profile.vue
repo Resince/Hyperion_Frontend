@@ -64,7 +64,7 @@
                 addressList.value[0]?.district ||
                 "无地址";
         },
-        { immediate: true }
+        { immediate: true, deep: true }
     );
     const initeData = () => {
         // 初始化个人信息
