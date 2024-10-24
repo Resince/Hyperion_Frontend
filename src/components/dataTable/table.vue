@@ -52,6 +52,7 @@
                         ))}
                     </tr>
                 ))}
+                <tr ref={loadMoreTrigger}></tr>
             </tbody>
         );
     };
@@ -124,10 +125,6 @@
             <slot style="display: none"> </slot>
             <!-- 通过自己定义的tsx函数来定义tbody -->
             <DataTable />
-            <div
-                ref="loadMoreTrigger"
-                class="load-more-trigger"
-            ></div>
         </table>
     </div>
 </template>

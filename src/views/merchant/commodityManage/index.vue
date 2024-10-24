@@ -15,26 +15,35 @@
     const handleAdd = () => {
         addVisible.value = !addVisible.value;
     };
+    //没有对应接口，不实现
     const handleSearch = async (i: any) => {
         await store.dispatch("goodsStoreModule/getGoodsSearchListAction", {
             pageNum: 1,
-            pageSize: 15,
+            pageSize: 10,
             keyword: i,
-            category: "",
         });
     };
+    // 删除商品
     const handleDelete = async (id: number) => {
         await store.dispatch("goodsStoreModule/deleteGoodsAction", { id });
-        init();
+        await init();
     };
     // 数据加载
     const data = computed<IGoodsList>(
         () => store.getters["goodsStoreModule/gGoodsMerchantList"]
     );
+    // 数据初始化以及更新
     const init = async () => {
         await store.dispatch("goodsStoreModule/getGoodsMerchantListAction", {
+            pagenum: 1,
+            pagesize: pageNum.value * 10, // 更新的时候加载现在所有的页面
+        });
+    };
+    // 滚动加载
+    const loadMore = async () => {
+        await store.dispatch("goodsStoreModule/getGoodsMerchantListAction", {
             pagenum: pageNum.value,
-            pagesize: 5,
+            pagesize: 10,
         });
     };
     onMounted(() => {
@@ -96,14 +105,16 @@
         }
     };
     const handleClickOrder = async () => {};
+
     // 滚动加载
     const pageNum = ref<number>(1);
     const handleLoadMore = async () => {
         if (data.value && data.value.total <= pageNum.value * 5) {
             return;
         }
+        console.log("触发")
         pageNum.value++;
-        await init();
+        await loadMore();
     };
 </script>
 
@@ -293,7 +304,10 @@
             </DataTable>
         </Container>
     </Main>
-    <DialogAddGood v-model:addVisible="addVisible"></DialogAddGood>
+    <DialogAddGood
+        v-model:addVisible="addVisible"
+        @update="init"
+    ></DialogAddGood>
 </template>
 
 <style lang="scss">

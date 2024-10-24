@@ -6,12 +6,14 @@
     const router = useRouter();
     const store = useStore();
     // 初始化地址信息
-    const addressList = computed(() => store.getters["addressStoreModule/gAddressList"]);
+    const addressList = computed(
+        () => store.getters["addressStoreModule/gAddressList"]
+    );
     const addressSelected = ref<IAddressListItem>({} as IAddressListItem);
-const initAddress = async () => {
+    const initAddress = async () => {
         await store.dispatch("addressStoreModule/reqAddressListAction");
         // 默认地址
-        addressList.value.map((item:any) => {
+        addressList.value.map((item: any) => {
             if (item.isDefault === 1) addressSelected.value = item;
         });
         // 没有默认地址，选择第一个地址
@@ -39,6 +41,7 @@ const initAddress = async () => {
     // 提交订单
     const buttonMsg = ref("提交订单");
     const dialogPayVisible = ref(false);
+    let id = [];
     const handleSubmit = async () => {
         if (!addressSelected.value || !tableData.value) {
             return;
@@ -48,6 +51,7 @@ const initAddress = async () => {
             goodsIdList: tableData.value.map((item: any) => item.id),
         });
         console.log(res);
+        id = res.data;
         dialogPayVisible.value = true;
         buttonMsg.value = "支付订单";
     };
@@ -56,9 +60,15 @@ const initAddress = async () => {
     });
     const handlePayOrder = async () => {
         dialogPayVisible.value = false;
-        await store.dispatch("orderStoreModule/orderPayAction", {
-            orderId: tableData.value.id,
+        const promises: any[] = [];
+        id.forEach((i) => {
+            promises.push(
+                store.dispatch("orderStoreModule/orderPayAction", {
+                    orderId: id,
+                })
+            );
         });
+        await Promise.all(promises);
         router.push({ name: "ConsumerHome", params: { category: "new" } });
     };
 </script>

@@ -16,8 +16,6 @@ export const getOrderList = (
 };
 
 export const getOrderDetail = (id: number) => {
-    console.log(id);
-
     return request.get<IDataType<IOrder>>(`/order/detail`, {
         params: {
             id,
@@ -40,9 +38,8 @@ export const getOrderListByMerchant = (
 };
 
 export const createOrder = (addrId: number, goodsIdList: number[]) => {
-    console.log(addrId, goodsIdList);
     return request.post<IDataType<any>>("/order/add", {
-        addrId,
+        addrId: addrId,
         goodsIdList,
     });
 };
@@ -64,8 +61,6 @@ export const orderReview = (
     goodsId: number,
     review: number
 ) => {
-    console.log(orderId, goodsId, review);
-
     return request.patch<IDataType>(
         "/order/review",
         { orderId, goodsId, review },

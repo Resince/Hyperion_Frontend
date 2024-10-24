@@ -44,7 +44,7 @@ const goodsStoreModule: Module<IGoods, IRootState> = {
         changeGoodsMerchantList(state, payload) {
             if (payload.payload.pageNum === 1) {
                 state.goodsMerchantList = payload.data;
-            } else {
+            } else if (state.goodsMerchantList.items) {
                 state.goodsMerchantList.items =
                     state.goodsMerchantList.items.concat(payload.data.items);
             }

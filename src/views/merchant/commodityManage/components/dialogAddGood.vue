@@ -81,7 +81,7 @@
     import { options } from "@/types/dict";
     import { watch } from "vue";
     const store = useStore();
-
+    const emit = defineEmits(["update"]);
     const addVisible = defineModel("addVisible");
     const handleExit = () => {
         addVisible.value = false;
@@ -118,10 +118,8 @@
             "goodsStoreModule/addGoodsAction",
             addDataItem.value
         );
-        await store.dispatch("goodsStoreModule/getGoodsMerchantListAction", {
-            pagenum: 1,
-            pagesize: 10,
-        });
+        // 向父组件发送更新请求
+        emit("update");
         addVisible.value = false;
     };
     watch(addVisible, (v) => {

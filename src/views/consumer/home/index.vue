@@ -9,12 +9,25 @@
     // 数据加载和分页
     const category = ref<string>("");
     const pageNum = ref<number>(1);
-    const changeCardList = async () => {
+    const loadMore = async () => {
         category.value = route.params.category as string;
         const params: IgoodsAllListRequest = {
             category: category.value,
             pageNum: pageNum.value,
-            pageSize: 15,
+            pageSize: 25,
+        };
+        await store.dispatch(
+            "goodsStoreModule/getGoodsSearchListAction",
+            params
+        );
+    };
+    // 更新数据使用
+    const init = async () => {
+        category.value = route.params.category as string;
+        const params: IgoodsAllListRequest = {
+            category: category.value,
+            pageNum: 1,
+            pageSize: 25 * pageNum.value,
         };
         await store.dispatch(
             "goodsStoreModule/getGoodsSearchListAction",
@@ -29,12 +42,12 @@
                 if (entries[0].isIntersecting) {
                     if (
                         goodsData.value &&
-                        goodsData.value.total <= pageNum.value * 15
+                        goodsData.value.total <= pageNum.value * 25
                     ) {
                         return;
                     }
                     pageNum.value++;
-                    await changeCardList();
+                    await loadMore();
                 }
             },
             {
@@ -49,7 +62,7 @@
     watch(
         () => route.params.category,
         async () => {
-            await changeCardList();
+            await init();
         },
         { immediate: true }
     );
