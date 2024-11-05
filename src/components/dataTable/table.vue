@@ -3,6 +3,7 @@
     import { computed } from "vue";
     import { useStore } from "@/store";
     import { JSX } from "vue/jsx-runtime";
+    import { watch } from "vue";
     const store = useStore();
     const props = defineProps<{
         title: string;
@@ -35,12 +36,15 @@
     });
 
     const DataTable = (): JSX.Element => {
+        const isButtom = (index: number) =>
+            props.orders && props.orders?.length - 1 === index;
         return (
             <tbody style={props.tbodyMaxHeight ? styleScroll.value : null}>
-                {props.orders?.map((order) => (
+                {props.orders?.map((order, index) => (
                     <tr
                         key={order.id}
                         onClick={() => emit("handleClickOrder", order.id)}
+                        ref={isButtom(index) ? loadMoreTrigger : undefined}
                     >
                         {columns.value.map((column: any, index: any) => (
                             <td
@@ -52,7 +56,6 @@
                         ))}
                     </tr>
                 ))}
-                <tr ref={loadMoreTrigger}></tr>
             </tbody>
         );
     };
@@ -64,21 +67,19 @@
     };
     // 滚动加载
     const loadMoreTrigger = ref<HTMLElement | null>(null);
-    onMounted(() => {
-        const observer = new IntersectionObserver(
-            async (entries) => {
-                if (entries[0].isIntersecting) {
-                    emit("handleLoadMore");
-                }
-            },
-            {
-                root: null,
-                rootMargin: "0px",
-                threshold: 1.0,
+    watch(
+        () => loadMoreTrigger.value,
+        () => {
+            if (loadMoreTrigger.value) {
+                const observer = new IntersectionObserver((entries) => {
+                    if (entries[0].isIntersecting) {
+                        emit("handleLoadMore");
+                    }
+                });
+                observer.observe(loadMoreTrigger.value);
             }
-        );
-        observer.observe(loadMoreTrigger.value as HTMLElement);
-    });
+        }
+    );
 </script>
 <template>
     <div

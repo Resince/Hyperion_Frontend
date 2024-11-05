@@ -39,15 +39,8 @@
             pagesize: pageNum.value * 10, // 更新的时候加载现在所有的页面
         });
     };
-    // 滚动加载
-    const loadMore = async () => {
-        await store.dispatch("goodsStoreModule/getGoodsMerchantListAction", {
-            pagenum: pageNum.value,
-            pagesize: 10,
-        });
-    };
-    onMounted(() => {
-        init();
+    onMounted(async() => {
+        await init();
     });
     // 编辑商品
     const edtiId = ref<number>(-1);
@@ -109,12 +102,18 @@
     // 滚动加载
     const pageNum = ref<number>(1);
     const handleLoadMore = async () => {
-        if (data.value && data.value.total <= pageNum.value * 5) {
+        if (data.value && data.value.total <= pageNum.value * 10) {
             return;
         }
-        console.log("触发")
         pageNum.value++;
+        console.log("触发", pageNum.value);
         await loadMore();
+    };
+    const loadMore = async () => {
+        await store.dispatch("goodsStoreModule/getGoodsMerchantListAction", {
+            pagenum: pageNum.value,
+            pagesize: 10,
+        });
     };
 </script>
 

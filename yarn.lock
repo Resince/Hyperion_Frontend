@@ -1211,6 +1211,26 @@ html-tags@^3.3.1:
   resolved "https://registry.npmjs.org/html-tags/-/html-tags-3.3.1.tgz"
   integrity sha512-ztqyC3kLto0e9WbNp0aeP+M3kTt+nbaIveGmUxAtZa+8iFgKLUOD4YKM5j+f3QD89bra7UeumolZHKuOXnTmeQ==
 
+"hyperion-frontend@file:":
+  version "0.0.0"
+  resolved "file:"
+  dependencies:
+    "@element-plus/icons-vue" "^2.3.1"
+    "@types/node" "^22.7.4"
+    "@vitejs/plugin-vue-jsx" "^4.0.1"
+    axios "^1.7.7"
+    crypto-js "^4.2.0"
+    element-plus "^2.8.3"
+    hyperion-frontend "file:"
+    nprogress "^0.2.0"
+    path "^0.12.7"
+    qs "^6.13.0"
+    sass "^1.79.4"
+    sass-loader "^16.0.2"
+    vue "^3.4.37"
+    vue-router "^4.4.5"
+    vuex "^4.1.0"
+
 iconv-lite@^0.6.3:
   version "0.6.3"
   resolved "https://registry.npmmirror.com/iconv-lite/-/iconv-lite-0.6.3.tgz"
